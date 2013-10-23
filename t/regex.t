@@ -1,6 +1,9 @@
 # regex.t
 
-use Test::Most;
+use Test::More;
+
+use strict;
+use warnings;
 
 use Geo::UK::Postcode::Regex qw/ is_valid_pc is_strict_pc is_lax_pc /;
 

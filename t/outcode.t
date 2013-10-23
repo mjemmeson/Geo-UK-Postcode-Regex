@@ -1,6 +1,9 @@
 # outcode.t
 
-use Test::Most;
+use Test::More;
+
+use strict;
+use warnings;
 
 use Geo::UK::Postcode::Regex;
 

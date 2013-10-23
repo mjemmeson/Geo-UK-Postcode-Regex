@@ -94,8 +94,9 @@ our @EXPORT_OK = qw/ is_valid_pc is_strict_pc is_lax_pc /;
 
 =head1 DESCRIPTION
 
-Parsing UK postcodes with regular expressions. This package can be used
-separately to avoid the overhead of loading any dependencies.
+Parsing UK postcodes with regular expressions. This package has been
+separated from L<Geo::UK::Postcode> so it can be installed and used without
+dependencies.
 
 Can handle partial postcodes (just the outcode or sector) and can test
 against valid characters and currently valid outcodes.
