@@ -2,5 +2,7 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.001     2013-10-23 12:20:07 Europe/London
+
   - Initial release - Separated from Geo::UK::Postcode and simplified dependencies
 
