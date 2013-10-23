@@ -15,26 +15,30 @@ my $lax_re = $pkg->regex;
 
 my ( @failures, @strict_failures );
 
-my $file = $ENV{HOME} . '/dev/postcodes/codepointopen_postcodes';
+SKIP: {
+    skip "TODO download codepoint", 1;
 
-my @pcs = read_file $file;
+    my $file = $ENV{HOME} . '/dev/postcodes/codepointopen_postcodes';
 
-foreach (@pcs) {
-    chomp;
-    push @failures,        $_ unless /$lax_re/;
-    push @strict_failures, $_ unless /$re/;
+    my @pcs = read_file $file;
 
-    # try without space
-    s/\s+/ /;
-    push @failures,        $_ unless /$lax_re/;
-    push @strict_failures, $_ unless /$re/;
+    foreach (@pcs) {
+        chomp;
+        push @failures,        $_ unless /$lax_re/;
+        push @strict_failures, $_ unless /$re/;
+
+        # try without space
+        s/\s+/ /;
+        push @failures,        $_ unless /$lax_re/;
+        push @strict_failures, $_ unless /$re/;
+    }
+
+    ok( !@failures, "all geographical postcodes passed lax regex" )
+        or warn Dumper( [ sort @failures ] );
+
+    ok( !@strict_failures, "all geographical postcodes passed strict regex" )
+        or warn Dumper( [ sort @strict_failures ] );
 }
-
-ok( !@failures, "all geographical postcodes passed lax regex" )
-    or warn Dumper( [ sort @failures ] );
-
-ok( !@strict_failures, "all geographical postcodes passed strict regex" )
-    or warn Dumper( [ sort @strict_failures ] );
 
 done_testing();
 
