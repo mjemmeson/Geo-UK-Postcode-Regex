@@ -439,6 +439,38 @@ sub posttowns_lookup {
     return \%POSTTOWNS;
 }
 
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Geo::UK::Postcode>
+
+=item *
+
+L<Geo::Address::Mail::UK>
+
+=item *
+
+L<Geo::Postcode>
+
+=item *
+
+L<Data::Validation::Constraints::Postcode>
+
+=item *
+
+L<CGI::Untaint::uk_postcode>
+
+=item *
+
+L<Form::Validator::UKPostcode>
+
+=back
+
+=cut
+
 1;
 
 __DATA__
