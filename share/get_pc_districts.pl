@@ -65,7 +65,7 @@ foreach my $row (@rows) {
             or die "can't parse district";
 
         $districts{$district} ||= {
-	    district => $district,
+            district         => $district,
             area             => $area,
             digits           => $digits,
             post_town        => [],

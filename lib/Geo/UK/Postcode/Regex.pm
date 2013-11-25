@@ -86,11 +86,11 @@ our @EXPORT_OK = qw/ is_valid_pc is_strict_pc is_lax_pc /;
     
     
     ## POSTTOWNS
-    my (@posttowns) = Geo::UK::Postcode::Regex->outcode_to_posttowns($outcode);
+    my @posttowns = Geo::UK::Postcode::Regex->outcode_to_posttowns($outcode);
     
     
     ## OUTCODES
-    my (@outcodes) = Geo::UK::Postcode::Regex->posttown_to_outcodes($posttown);
+    my @outcodes = Geo::UK::Postcode::Regex->posttown_to_outcodes($posttown);
 
 =head1 DESCRIPTION
 
