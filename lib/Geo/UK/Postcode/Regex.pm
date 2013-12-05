@@ -13,33 +13,34 @@ our @EXPORT_OK = qw/ is_valid_pc is_strict_pc is_lax_pc /;
 =head1 SYNOPSIS
 
     use Geo::UK::Postcode::Regex;
-    
+
     ## REGULAR EXPRESSIONS
-    
+
     my $lax_re    = Geo::UK::Postcode::Regex->regex;
     my $strict_re = Geo::UK::Postcode::Regex->regex_strict;
     my $valid_re  = Geo::UK::Postcode::Regex->valid_regex;
-    
+
     if ( $foo =~ $lax_re ) {
         my ( $area, $district, $sector, $unit ) = ( $1, $2, $3, $4 );
         my $subdistrict = $district =~ s/([A-Z])$// ? $1 : undef;
         ...
     }
-    
+
     if ( $foo =~ $strict_re ) {
         my ( $area, $district, $sector, $unit ) = ( $1, $2, $3, $4 );
         my $subdistrict = $district =~ s/([A-Z])$// ? $1 : undef;
         ...
     }
-    
+
     if ( $foo =~ $valid_re ) {
         my ( $outcode, $sector, $unit ) = ( $1, $2, $3 );
         ...
     }
 
-    # VALIDATION METHODS
+
+    ## VALIDATION METHODS
     use Geo::UK::Postcode::Regex qw/ is_valid_pc is_strict_pc is_lax_pc /;
-    
+
     if (is_valid_pc("GE0 1UK")) {
         ...
     }
@@ -49,10 +50,11 @@ our @EXPORT_OK = qw/ is_valid_pc is_strict_pc is_lax_pc /;
     if (is_lax_pc("GE0 1UK")) {
         ...
     }
-    
+
+
     ## PARSING
     my $parsed = Geo::UK::Postcode::Regex->parse("WC1H 9EB");
-    
+
     # returns:
     # {   area             => 'WC',
     #     district         => '1',
@@ -67,30 +69,31 @@ our @EXPORT_OK = qw/ is_valid_pc is_strict_pc is_lax_pc /;
     #     non_geographical => 1 | 0,
     #     bfpo             => 1 | 0,
     # }
-    
+
     # strict parsing (only valid characters):
     ...->parse( $pc, { strict => 1 } )
-    
+
     # valid outcodes only
     ...->parse( $pc, { valid => 1 } )
-    
+
     # match partial postcodes, e.g. 'WC1H', 'WC1H 9'
     ...->parse( $pc, { partial => 1 } )
-    
-    
+
+
     ## EXTRACT OUTCODE
     my $outcode = Geo::UK::Postcode::Regex->outcode("AB101AA"); # returns 'AB10'
-    
+
     my $outcode = Geo::UK::Postcode::Regex->outcode( $postcode, { valid => 1 } )
         or die "Invalid postcode";
-    
-    
+
+
     ## POSTTOWNS
     my @posttowns = Geo::UK::Postcode::Regex->outcode_to_posttowns($outcode);
-    
-    
+
+
     ## OUTCODES
     my @outcodes = Geo::UK::Postcode::Regex->posttown_to_outcodes($posttown);
+
 
 =head1 DESCRIPTION
 
@@ -147,10 +150,10 @@ my %COMPONENTS = (
 );
 
 my %base_regexes = (
-    full          => '^ (%s) (%s) \s*     (%s) (%s)     $',
+    full          => '^ (%s) (%s)     \s* (%s) (%s)      $',
     partial       => '^ (%s) (%s) (?: \s* (%s) (%s)? ) ? $',
-    valid_full    => '^ (%s) \s*     (%s) (%s)     $',
-    valid_partial => '^ (%s) (?: \s* (%s) (%s)? ) ? $',
+    valid_full    => '^ (%s)          \s* (%s) (%s)      $',
+    valid_partial => '^ (%s)      (?: \s* (%s) (%s)? ) ? $',
 );
 
 my %REGEXES;
@@ -199,7 +202,7 @@ sub _outcode_data {
         push @{ $OUTCODES_FOR_REGEX{BX} }, $_;
     }
 
-    my $tmp = join(
+    my $outcodes_re = join(
         "|\n",
         map {
             sprintf(
@@ -212,7 +215,7 @@ sub _outcode_data {
     foreach my $size (qw/ full partial /) {
         my $re = sprintf(
             $base_regexes{"valid_$size"},
-            $tmp,
+            $outcodes_re,
             $COMPONENTS{strict}->{sector},
             $COMPONENTS{strict}->{unit}
         );
