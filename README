@@ -7,33 +7,34 @@ VERSION
 
 SYNOPSIS
         use Geo::UK::Postcode::Regex;
-    
+
         ## REGULAR EXPRESSIONS
-    
+
         my $lax_re    = Geo::UK::Postcode::Regex->regex;
         my $strict_re = Geo::UK::Postcode::Regex->regex_strict;
         my $valid_re  = Geo::UK::Postcode::Regex->valid_regex;
-    
+
         if ( $foo =~ $lax_re ) {
             my ( $area, $district, $sector, $unit ) = ( $1, $2, $3, $4 );
             my $subdistrict = $district =~ s/([A-Z])$// ? $1 : undef;
             ...
         }
-    
+
         if ( $foo =~ $strict_re ) {
             my ( $area, $district, $sector, $unit ) = ( $1, $2, $3, $4 );
             my $subdistrict = $district =~ s/([A-Z])$// ? $1 : undef;
             ...
         }
-    
+
         if ( $foo =~ $valid_re ) {
             my ( $outcode, $sector, $unit ) = ( $1, $2, $3 );
             ...
         }
 
-        # VALIDATION METHODS
+
+        ## VALIDATION METHODS
         use Geo::UK::Postcode::Regex qw/ is_valid_pc is_strict_pc is_lax_pc /;
-    
+
         if (is_valid_pc("GE0 1UK")) {
             ...
         }
@@ -43,10 +44,11 @@ SYNOPSIS
         if (is_lax_pc("GE0 1UK")) {
             ...
         }
-    
+
+
         ## PARSING
         my $parsed = Geo::UK::Postcode::Regex->parse("WC1H 9EB");
-    
+
         # returns:
         # {   area             => 'WC',
         #     district         => '1',
@@ -61,28 +63,28 @@ SYNOPSIS
         #     non_geographical => 1 | 0,
         #     bfpo             => 1 | 0,
         # }
-    
+
         # strict parsing (only valid characters):
         ...->parse( $pc, { strict => 1 } )
-    
+
         # valid outcodes only
         ...->parse( $pc, { valid => 1 } )
-    
+
         # match partial postcodes, e.g. 'WC1H', 'WC1H 9'
         ...->parse( $pc, { partial => 1 } )
-    
-    
+
+
         ## EXTRACT OUTCODE
         my $outcode = Geo::UK::Postcode::Regex->outcode("AB101AA"); # returns 'AB10'
-    
+
         my $outcode = Geo::UK::Postcode::Regex->outcode( $postcode, { valid => 1 } )
             or die "Invalid postcode";
-    
-    
+
+
         ## POSTTOWNS
         my @posttowns = Geo::UK::Postcode::Regex->outcode_to_posttowns($outcode);
-    
-    
+
+
         ## OUTCODES
         my @outcodes = Geo::UK::Postcode::Regex->posttown_to_outcodes($posttown);
 
@@ -197,16 +199,16 @@ SEE ALSO
 SUPPORT
   Bugs / Feature Requests
     Please report any bugs or feature requests through the issue tracker at
-    <https://github.com/mjemmeson/Geo-UK-Postcode-Regex/issues>. You will be
+    <https://github.com/mjemmeson/geo-uk-postcode-regex/issues>. You will be
     notified automatically of any progress on your issue.
 
   Source Code
     This is open source software. The code repository is available for
     public review and contribution under the terms of the license.
 
-    <https://github.com/mjemmeson/Geo-UK-Postcode-Regex>
+    <https://github.com/mjemmeson/geo-uk-postcode-regex>
 
-      git clone https://github.com/mjemmeson/Geo-UK-Postcode-Regex.git
+      git clone git://github.com/mjemmeson/geo-uk-postcode-regex.git
 
 AUTHOR
     Michael Jemmeson <mjemmeson@cpan.org>

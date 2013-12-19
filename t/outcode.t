@@ -26,5 +26,15 @@ note "valid only";
 is $pkg->outcode( 'AB10 1AA', { valid => 1 } ), 'AB10', "valid";
 ok !$pkg->outcode( 'AB1', { valid => 1 } ), 'invalid fails';
 
+note "strict";
+is $pkg->outcode( 'AB10 1AA', { strict => 1 } ), 'AB10', "full";
+is $pkg->outcode( 'AB10',     { strict => 1 } ), 'AB10', 'partial';
+ok !$pkg->outcode( 'AB10A 1AA', { strict => 1 } ), 'invalid full fails';
+ok !$pkg->outcode( 'AB10A',     { strict => 1 } ), 'invalid partial fails';
+
+note "non-geo";
+is $pkg->outcode('YO91 1AA'), 'YO91', 'full';
+is $pkg->outcode('YO91'),     'YO91', 'partial';
+
 done_testing();
 

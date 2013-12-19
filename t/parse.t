@@ -16,32 +16,26 @@ local $Data::Dumper::Sortkeys = 1;
 
 my $pkg = 'Geo::UK::Postcode::Regex';
 
+my @tests = (
+    { 'parse'              => {} },
+    { 'strict'             => { strict => 1 } },
+    { 'valid'              => { valid => 1 } },
+    { 'partial'            => { partial => 1 } },
+    { 'strict and valid'   => { strict => 1, valid => 1 } },
+    { 'strict and partial' => { strict => 1, partial => 1 } },
+    { 'valid and partial'  => { valid => 1, partial => 1 } },
+);
 
-note "parse";
-test_parse();
-
-note "parse - strict";
-test_parse( { strict => 1 } );
-
-note "parse - valid";
-test_parse( { valid => 1 } );
-
-note "parse - partial";
-test_parse( { partial => 1 } );
-
-note "combinations - strict and valid";
-test_parse( { strict => 1, valid => 1 } );
-
-note "combinations - strict and partial";
-test_parse( { strict => 1, partial => 1 } );
-
-note "combinations - valid and partial";
-test_parse( { valid => 1, partial => 1 } );
-
+foreach (@tests) {
+    my ($note,$args) = each %{$_};
+    subtest( $note => sub {test_parse( $args ) });
+}
 
 sub msg {
     my ( $pc, $expected ) = @_;
-    return $expected->{area} ? "$pc parsed as expected" : "$pc invalid as expected";
+    return $expected->{area}
+        ? "$pc parsed as expected"
+        : "$pc invalid as expected";
 }
 
 sub test_parse {
