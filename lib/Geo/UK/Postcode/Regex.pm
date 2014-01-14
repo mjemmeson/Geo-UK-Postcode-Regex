@@ -124,7 +124,7 @@ without whitespace.
 my $AREA1 = 'ABCDEFGHIJKLMNOPRSTUWYZ';    # [^QVX]
 my $AREA2 = 'ABCDEFGHKLMNOPQRSTUVWXY';    # [^IJZ]
 
-my $SUBDISTRICT1 = 'ABCDEFGHJKSTUW';      # for single letter areas
+my $SUBDISTRICT1 = 'ABCDEFGHJKPSTUW';     # for single letter areas
 my $SUBDISTRICT2 = 'ABEHMNPRVWXY';        # for two letter areas
 
 my $UNIT1 = 'ABDEFGHJLNPQRSTUWXYZ';       # [^CIKMOV]

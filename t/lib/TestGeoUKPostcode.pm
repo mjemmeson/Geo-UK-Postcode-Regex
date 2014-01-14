@@ -281,6 +281,28 @@ my @TEST_PCS = (
         partial       => 1,
         strict        => 1,
     },
+
+    {   raw           => 'N1 0XX',
+        area          => 'N',
+        district      => '1',
+        subdistrict   => undef,
+        sector        => '0',
+        unit          => 'XX',
+        fixed_format  => 'N1   0XX',
+        valid_outcode => 1,
+        strict        => 1,
+    },
+    {   raw              => 'N1P 2NG',
+        area             => 'N',
+        district         => '1',
+        subdistrict      => 'P',
+        sector           => '2',
+        unit             => 'NG',
+        fixed_format     => 'N1P  2NG',
+        valid_outcode    => 1,
+        strict           => 1,
+        non_geographical => 1,
+    },
 );
 
 sub test_pcs {
