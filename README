@@ -3,7 +3,7 @@ NAME
     postcodes
 
 VERSION
-    version 0.006
+    version 0.007
 
 SYNOPSIS
         use Geo::UK::Postcode::Regex;
@@ -199,16 +199,16 @@ SEE ALSO
 SUPPORT
   Bugs / Feature Requests
     Please report any bugs or feature requests through the issue tracker at
-    <https://github.com/mjemmeson/geo-uk-postcode-regex/issues>. You will be
+    <https://github.com/mjemmeson/Geo-UK-Postcode-Regex/issues>. You will be
     notified automatically of any progress on your issue.
 
   Source Code
     This is open source software. The code repository is available for
     public review and contribution under the terms of the license.
 
-    <https://github.com/mjemmeson/geo-uk-postcode-regex>
+    <https://github.com/mjemmeson/Geo-UK-Postcode-Regex>
 
-      git clone git://github.com/mjemmeson/geo-uk-postcode-regex.git
+      git clone https://github.com/mjemmeson/Geo-UK-Postcode-Regex.git
 
 AUTHOR
     Michael Jemmeson <mjemmeson@cpan.org>

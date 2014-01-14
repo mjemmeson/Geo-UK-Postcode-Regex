@@ -2,6 +2,8 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+  - BUGFIX: 'P' missing in possible subdistricts for single character areas ('N1P' only use)
+
 0.006     2013-12-20 12:57:44 Europe/London
 
   - Tidy and tests
