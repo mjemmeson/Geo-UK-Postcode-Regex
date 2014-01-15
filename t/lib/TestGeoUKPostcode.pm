@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 my @TEST_PCS = (
-    { raw => 'X' },
+    { raw => 'X', partial => 1 },
     {   raw          => 'XX1',
         area         => 'XX',
         district     => '1',
