@@ -309,6 +309,8 @@ sub is_lax_pc {
 
 =head2 extract
 
+    my @extracted = Geo::UK::Postcode::Regex->extract( $string, \%options );
+
 Returns a list of full postcodes extracted from a string.
 
 =cut

@@ -3,7 +3,7 @@ NAME
     postcodes
 
 VERSION
-    version 0.007
+    version 0.008
 
 SYNOPSIS
         use Geo::UK::Postcode::Regex;
@@ -14,18 +14,22 @@ SYNOPSIS
         my $strict_re = Geo::UK::Postcode::Regex->regex_strict;
         my $valid_re  = Geo::UK::Postcode::Regex->valid_regex;
 
+        # matching only
+        if ( $foo =~ $lax_re )    {...}
+        if ( $foo =~ $strict_re ) {...}
+        if ( $foo =~ $valid_re )  {...}
+
+        # matching and using components - see also parse()
         if ( $foo =~ $lax_re ) {
             my ( $area, $district, $sector, $unit ) = ( $1, $2, $3, $4 );
             my $subdistrict = $district =~ s/([A-Z])$// ? $1 : undef;
             ...
         }
-
         if ( $foo =~ $strict_re ) {
             my ( $area, $district, $sector, $unit ) = ( $1, $2, $3, $4 );
             my $subdistrict = $district =~ s/([A-Z])$// ? $1 : undef;
             ...
         }
-
         if ( $foo =~ $valid_re ) {
             my ( $outcode, $sector, $unit ) = ( $1, $2, $3 );
             ...
@@ -74,11 +78,16 @@ SYNOPSIS
         ...->parse( $pc, { partial => 1 } )
 
 
-        ## EXTRACT OUTCODE
+        ## EXTRACT OUTCODE FROM POSTCODE
         my $outcode = Geo::UK::Postcode::Regex->outcode("AB101AA"); # returns 'AB10'
 
         my $outcode = Geo::UK::Postcode::Regex->outcode( $postcode, { valid => 1 } )
             or die "Invalid postcode";
+
+
+        ## EXTRACT POSTCODES FROM TEXT
+        # \%options as per parse, excluding partial
+        my @extracted = Geo::UK::Postcode::Regex->extract( $text, \%options );
 
 
         ## POSTTOWNS
@@ -109,7 +118,7 @@ NOTES AND LIMITATIONS
     'B11' without whitespace.
 
 METHODS
-  strict_regex, regex, valid_regex
+  regex, strict_regex, valid_regex
     Return regular expressions to parse postcodes and capture the
     constituent parts: area, district, sector and unit (or outcode, sector
     and unit in the case of "valid_regex").
@@ -119,13 +128,16 @@ METHODS
 
     "valid_regex" checks that the outcode currently exists.
 
-  strict_regex_partial, regex_partial, valid_regex_partial
+  regex_partial, strict_regex_partial, valid_regex_partial
     As above, but matches on partial postcodes of just the outcode or sector
 
   is_valid_pc, is_strict_pc, is_lax_pc
         if (is_valid_pc( "AB1 2CD" ) ) { ... }
 
     Alternative way to access the regexes.
+
+  extract
+    Returns a list of full postcodes extracted from a string.
 
   parse
         my $parsed = Geo::UK::Postcode::Regex->parse( $pc, \%opts );

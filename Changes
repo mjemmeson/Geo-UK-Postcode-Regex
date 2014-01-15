@@ -2,6 +2,9 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+  - fixing parse.t tests
+  - adding extract() method
+
 0.007     2014-01-14 16:26:16+00:00 Europe/London
 
   - BUGFIX: 'P' missing in possible subdistricts for single character areas ('N1P' only use)
