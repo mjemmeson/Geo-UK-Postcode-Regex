@@ -137,6 +137,8 @@ METHODS
     Alternative way to access the regexes.
 
   extract
+        my @extracted = Geo::UK::Postcode::Regex->extract( $string, \%options );
+
     Returns a list of full postcodes extracted from a string.
 
   parse
