@@ -20,18 +20,22 @@ our @EXPORT_OK = qw/ is_valid_pc is_strict_pc is_lax_pc /;
     my $strict_re = Geo::UK::Postcode::Regex->regex_strict;
     my $valid_re  = Geo::UK::Postcode::Regex->valid_regex;
 
+    # matching only
+    if ( $foo =~ $lax_re )    {...}
+    if ( $foo =~ $strict_re ) {...}
+    if ( $foo =~ $valid_re )  {...}
+
+    # matching and using components - see also parse()
     if ( $foo =~ $lax_re ) {
         my ( $area, $district, $sector, $unit ) = ( $1, $2, $3, $4 );
         my $subdistrict = $district =~ s/([A-Z])$// ? $1 : undef;
         ...
     }
-
     if ( $foo =~ $strict_re ) {
         my ( $area, $district, $sector, $unit ) = ( $1, $2, $3, $4 );
         my $subdistrict = $district =~ s/([A-Z])$// ? $1 : undef;
         ...
     }
-
     if ( $foo =~ $valid_re ) {
         my ( $outcode, $sector, $unit ) = ( $1, $2, $3 );
         ...
@@ -279,6 +283,28 @@ sub is_lax_pc {
     return shift =~ $REGEXES{lax}->{full} ? 1 : 0
 }
 
+=head2 extract
+
+Returns a list of full postcodes extracted from a string.
+
+=cut
+
+# TODO need to/can do partial?
+
+sub extract {
+    my ( $class, $string, $options ) = @_;
+
+    my $re
+        = $options->{valid}  ? $class->valid_regex
+        : $options->{strict} ? $class->strict_regex
+        :                      $class->regex;
+
+    my @extracted = $string =~ m/($re)/g;
+
+    return @extracted;
+}
+
+
 =head2 parse
 
     my $parsed = Geo::UK::Postcode::Regex->parse( $pc, \%opts );
@@ -317,14 +343,13 @@ sub parse {
     my ( $area, $district, $sector, $unit )
         = $string =~ $REGEXES{strict}->{$size};
 
-    my $strict = $area ? 1 : 0;
+    my $strict = $area ? 1 : 0;    # matched strict?
 
     unless ($strict) {
         return if $options->{strict};
 
         # try lax regex
-        ( $area, $district, $sector, $unit )
-            = $string =~ $REGEXES{lax}->{$size}
+        ( $area, $district, $sector, $unit ) = $string =~ $REGEXES{lax}->{$size}
             or return;
     }
 
@@ -344,7 +369,7 @@ sub parse {
         sector      => $sector,
         unit        => $unit,
         outcode     => $outcode,
-        incode      => ( $sector || '' ) . ( $unit || '' ),
+        incode      => ( $sector // '' ) . ( $unit || '' ),
         valid_outcode => $outcode_data ? 1 : 0,
         strict        => $strict,
         partial       => $unit         ? 0 : 1,

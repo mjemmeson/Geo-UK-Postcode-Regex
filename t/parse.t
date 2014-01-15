@@ -19,7 +19,7 @@ my $pkg = 'Geo::UK::Postcode::Regex';
 my @tests = (
     { 'parse'              => {} },
     { 'strict'             => { strict => 1 } },
-    { 'valid'              => { valid => 1 } },
+    { 'valid'              => { valid_outcode => 1 } },
     { 'partial'            => { partial => 1 } },
     { 'strict and valid'   => { strict => 1, valid => 1 } },
     { 'strict and partial' => { strict => 1, partial => 1 } },
@@ -27,60 +27,42 @@ my @tests = (
 );
 
 foreach (@tests) {
-    my ($note,$args) = each %{$_};
-    subtest( $note => sub {test_parse( $args ) });
-}
+    my ( $note, $args ) = each %{$_};
+    subtest(
+        $note => sub {
+            my ($options) = @_;
 
-sub msg {
-    my ( $pc, $expected ) = @_;
-    return $expected->{area}
-        ? "$pc parsed as expected"
-        : "$pc invalid as expected";
+            $options ||= {};
+
+            foreach my $expected ( TestGeoUKPostcode->test_pcs($options) ) {
+
+                my @raw_list = TestGeoUKPostcode->get_format_list($expected);
+
+                subtest( $_ => sub { test_parse( $_, $options, $expected ) } )
+                    foreach @raw_list;
+            }
+        }
+    );
 }
 
 sub test_parse {
-    my ( $tests, $options ) = @_;
+    my ( $raw, $options, $test ) = @_;
 
-    $options ||= {};
+    my $parsed = $pkg->parse( $raw, $options );
 
-    foreach my $pc ( TestGeoUKPostcode->test_pcs($options) ) {
+    unless ( $test->{area} ) {
+        ok !$parsed, "False returned from invalid postcode";
+        return;
+    }
 
-        my @raw_list = TestGeoUKPostcode->get_format_list($pc);
+    ok $parsed, "parsed successfully";
 
-        foreach my $raw (@raw_list) {
+    is $parsed->{$_}, $test->{$_}, "$_ ok"
+        foreach qw/ area district subdistrict sector unit outcode incode /;
 
-            my $expected = clone $pc;
-
-            delete $expected->{raw};
-            delete $expected->{fixed_format};
-
-            if ( $expected->{area} ) {
-                $expected->{outcode} = sprintf( "%s%s%s",
-                    $expected->{area}, $expected->{district},
-                    $expected->{subdistrict} || '' );
-
-                $expected->{incode} = sprintf( "%s%s",
-                    $expected->{sector} || '',
-                    $expected->{unit}   || '' );
-
-                $expected->{valid_outcode} ||= 0;
-                $expected->{partial}       ||= 0;
-                $expected->{strict}        ||= 0;
-            }
-
-            $expected = undef    #
-                if !$expected->{area}
-                || ( $options->{strict} && !$expected->{strict}
-                or $options->{valid} && !$expected->{valid_outcode}
-                or !$options->{partial} && $expected->{partial} );
-
-            my $parsed = $pkg->parse( $raw, $options );
-
-            is_deeply $parsed, $expected, msg( $raw, $expected )
-                or die Dumper(
-                { parsed => $parsed, raw => $raw, expected => $expected } );
-
-        }
+    foreach (qw/ strict partial valid_outcode non_geographical bfpo /) {
+        is $parsed->{$_} || 0, $test->{$_} || 0,
+            $test->{$_} ? "postcode is $_" : "postcode isn't $_";
     }
 }
 

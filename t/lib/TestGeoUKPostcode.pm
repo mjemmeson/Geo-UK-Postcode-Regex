@@ -309,10 +309,12 @@ sub test_pcs {
     my ( $class, $args ) = @_;
 
     $args ||= {};
+    $args->{partial} ||= 0;
 
     my @pcs = sort { $a->{raw} cmp $b->{raw} } @TEST_PCS;
 
     foreach my $filter ( keys %{$args} ) {
+        $_->{$filter} //= 0 foreach @pcs;
         @pcs = grep { $_->{$filter} == $args->{$filter} } @pcs;
     }
 
