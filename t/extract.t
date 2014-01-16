@@ -10,7 +10,11 @@ use TestGeoUKPostcode;
 
 my $pkg = 'Geo::UK::Postcode::Regex';
 
-my @tests = ( { extract => { partial => 0 } }, );
+my @tests = (
+    { extract => { partial => 0 } },                #
+    { strict  => { partial => 0, strict => 1 } },
+    { valid   => { partial => 0, valid => 1 } },
+);
 
 foreach my $test (@tests) {
     my ( $note, $args ) = each %{$test};
@@ -32,7 +36,6 @@ sub test_extract {
     ok scalar(@extracted), "extracted ok";
 
     is_deeply \@extracted, \@list, "extracted postcodes match list";
-
 }
 
 done_testing();

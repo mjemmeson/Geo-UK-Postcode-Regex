@@ -36,7 +36,7 @@ foreach my $test ( TestGeoUKPostcode->test_pcs ) {
                 ok $raw !~ $strict_re, "$raw doesn't match strict regex";
             }
 
-            if ( $test->{valid_outcode} && $test->{strict} ) {
+            if ( $test->{valid} && $test->{strict} ) {
                 ok is_valid_pc($raw), "is_valid_pc true";
                 ok $raw =~ $valid_re, "$raw matches valid regex";
             } else {
@@ -67,7 +67,7 @@ foreach my $test ( TestGeoUKPostcode->test_pcs ) {
                 "$raw doesn't match strict regex partial";
         }
 
-        if ( $test->{valid_outcode} && $test->{strict} ) {
+        if ( $test->{valid} && $test->{strict} ) {
             ok $raw =~ $valid_re_partial, "$raw matches valid regex partial";
         } else {
             ok $raw !~ $valid_re_partial,

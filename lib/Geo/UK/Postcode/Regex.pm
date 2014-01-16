@@ -142,11 +142,11 @@ my $UNIT2 = 'ABDEFGHJLNPQRSTUWXYZ';       # [^CIKMOV]
 my %COMPONENTS = (
     strict => {
         area     => "[$AREA1][$AREA2]?",
-        district => qq%
+        district => qq% (?:
                             [0-9][0-9]?
             | (?<![A-Z]{2}) [0-9][$SUBDISTRICT1]?
             | (?<=[A-Z]{2}) [0-9][$SUBDISTRICT2]
-        %,
+        ) %,
         sector => '[0-9]',
         unit   => "[$UNIT1][$UNIT2]",
     },
@@ -161,8 +161,6 @@ my %COMPONENTS = (
 my %BASE_REGEXES = (
     full          => ' %s %s     \s* %s %s      ',
     partial       => ' %s %s (?: \s* %s %s? ) ? ',
-    valid_full    => ' %s        \s* %s %s      ',
-    valid_partial => ' %s    (?: \s* %s %s? ) ? ',
 );
 
 my (%REGEXES, %REGEXES_UNANCHORED);
@@ -235,22 +233,23 @@ sub _outcode_data {
 
         # anchored regex, with captures
         my $re = sprintf(
-            $BASE_REGEXES{"valid_$size"},
+            $BASE_REGEXES{$size},
             map {"($_)"} (
-                $outcodes_re, $COMPONENTS{strict}->{sector},
+                $outcodes_re, '',    #
+                $COMPONENTS{strict}->{sector},    #
                 $COMPONENTS{strict}->{unit}
             )
         );
-        $REGEXES{valid}->{$size} = qr/^$re$/ix;
+        $REGEXES{valid}->{$size} = qr/^$re$/x;
 
         # unanchored regex, with no captures
         $re = sprintf(
-            $BASE_REGEXES{"valid_$size"},
-            $outcodes_re,
-            $COMPONENTS{strict}->{sector},
+            $BASE_REGEXES{$size},
+            "(?: $outcodes_re )", '',             #
+            $COMPONENTS{strict}->{sector},        #
             $COMPONENTS{strict}->{unit}
         );
-        $REGEXES_UNANCHORED{valid}->{$size} = qr/$re/ix;
+        $REGEXES_UNANCHORED{valid}->{$size} = qr/$re/x;
     }
 }
 
@@ -319,6 +318,8 @@ Returns a list of full postcodes extracted from a string.
 
 sub extract {
     my ( $class, $string, $options ) = @_;
+
+    $class->_outcode_data() unless %OUTCODES;
 
     my $re
         = $options->{valid}  ? $REGEXES_UNANCHORED{valid}->{full}

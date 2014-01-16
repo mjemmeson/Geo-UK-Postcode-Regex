@@ -1,6 +1,7 @@
 # parse.t
 
-use Test::More;
+use
+Test::More;
 
 use strict;
 use warnings;
@@ -19,7 +20,7 @@ my $pkg = 'Geo::UK::Postcode::Regex';
 my @tests = (
     { 'parse'              => {} },
     { 'strict'             => { strict => 1 } },
-    { 'valid'              => { valid_outcode => 1 } },
+    { 'valid'              => { valid => 1 } },
     { 'partial'            => { partial => 1 } },
     { 'strict and valid'   => { strict => 1, valid => 1 } },
     { 'strict and partial' => { strict => 1, partial => 1 } },
@@ -60,7 +61,12 @@ sub test_parse {
     is $parsed->{$_}, $test->{$_}, "$_ ok"
         foreach qw/ area district subdistrict sector unit outcode incode /;
 
-    foreach (qw/ strict partial valid_outcode non_geographical bfpo /) {
+    is $parsed->{valid_outcode} || 0, $test->{valid} || 0,
+        $test->{valid}
+        ? "postcode has valid_outcode"
+        : "postcode doesn't have valid_outcode";
+
+    foreach (qw/ strict partial non_geographical bfpo /) {
         is $parsed->{$_} || 0, $test->{$_} || 0,
             $test->{$_} ? "postcode is $_" : "postcode isn't $_";
     }
