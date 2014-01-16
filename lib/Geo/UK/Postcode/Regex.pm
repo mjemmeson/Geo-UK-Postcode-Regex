@@ -139,7 +139,7 @@ my $SUBDISTRICT2 = 'ABEHMNPRVWXY';        # for two letter areas
 my $UNIT1 = 'ABDEFGHJLNPQRSTUWXYZ';       # [^CIKMOV]
 my $UNIT2 = 'ABDEFGHJLNPQRSTUWXYZ';       # [^CIKMOV]
 
-my %COMPONENTS = (
+our %COMPONENTS = (
     strict => {
         area     => "[$AREA1][$AREA2]?",
         district => qq% (?:
@@ -149,6 +149,7 @@ my %COMPONENTS = (
         ) %,
         sector => '[0-9]',
         unit   => "[$UNIT1][$UNIT2]",
+        blank  => '',
     },
     lax => {
         area     => '[A-Z]{1,2}',
@@ -163,32 +164,46 @@ my %BASE_REGEXES = (
     partial       => ' %s %s (?: \s* %s %s? ) ? ',
 );
 
-my (%REGEXES, %REGEXES_UNANCHORED);
+{
+    package Geo::UK::Postcode::Regex::Hash;
 
-foreach my $type (qw/ strict lax /) {
-    my $components = $COMPONENTS{$type};
+    require Tie::Hash;
 
-    foreach my $size (qw/ full partial /) {
+    our @ISA = qw/ Tie::StdHash /;
 
-        # anchored regex, with captures
-        my $re = sprintf(
-            $BASE_REGEXES{$size},
-            map {"($_)"} @{$components}{qw/ area district sector unit /}
-        );
-        $REGEXES{$type}->{$size} = qr/^$re$/x;
-
-        # unanchored, with no captures
-        $re = sprintf(
-            $BASE_REGEXES{$size},
-             @{$components}{qw/ area district sector unit /}
-        );
-        $REGEXES_UNANCHORED{$type}->{$size} = qr/$re/x;
+    sub TIEHASH { bless {}, shift }
+    sub FETCH {
+        my ($this,$key) = @_;
+        $this->{$key} //= Geo::UK::Postcode::Regex->_get_re( $key );
+        return $this->{$key};
     }
 }
 
-## OUTCODE AND POSTTOWN DATA
-
 my ( %POSTTOWNS, %OUTCODES, %OUTCODES_FOR_REGEX );
+
+our %REGEXES;
+tie %REGEXES, 'Geo::UK::Postcode::Regex::Hash';
+
+sub _get_re {
+    my ( $class, $key ) = @_;
+
+    $class->_outcode_data() if index( $key, 'valid' ) && !%OUTCODES;
+
+    my @comps
+        = index( $key, 'valid' )
+        ? @{$COMPONENTS}{qw/ outcodes blank sector unit /}
+        : @{$COMPONENTS}{qw/ area district sector unit /};
+
+    @comps = map { $_ ? "($_)" : $_ } @comps if index( $key, 'captures' );
+
+    my $size = index( $key, 'partial' ) ? 'partial' : 'full';
+
+    my $re = sprintf( $BASE_REGEXES{$size}, @comps );
+
+    return index( $key, anchored ) ? qr/^$re$/x : qr/$re/x;
+}
+
+## OUTCODE AND POSTTOWN DATA
 
 sub _outcode_data {
     my $class = shift;
@@ -219,7 +234,7 @@ sub _outcode_data {
         push @{ $OUTCODES_FOR_REGEX{BX} }, $_;
     }
 
-    my $outcodes_re = join(
+    $Geo::UK::Postcode::Regex::COMPONENTS{strict}->{outcodes} = '(?: ' . join(
         "|\n",
         map {
             sprintf(
@@ -227,30 +242,7 @@ sub _outcode_data {
                 $_, join( '|', @{ $OUTCODES_FOR_REGEX{$_} } )
                 )
         } sort keys %OUTCODES_FOR_REGEX
-    );
-
-    foreach my $size (qw/ full partial /) {
-
-        # anchored regex, with captures
-        my $re = sprintf(
-            $BASE_REGEXES{$size},
-            map {"($_)"} (
-                $outcodes_re, '',    #
-                $COMPONENTS{strict}->{sector},    #
-                $COMPONENTS{strict}->{unit}
-            )
-        );
-        $REGEXES{valid}->{$size} = qr/^$re$/x;
-
-        # unanchored regex, with no captures
-        $re = sprintf(
-            $BASE_REGEXES{$size},
-            "(?: $outcodes_re )", '',             #
-            $COMPONENTS{strict}->{sector},        #
-            $COMPONENTS{strict}->{unit}
-        );
-        $REGEXES_UNANCHORED{valid}->{$size} = qr/$re/x;
-    }
+    ) . ' )';
 }
 
 =head1 METHODS
@@ -273,20 +265,13 @@ or sector
 
 =cut
 
-sub strict_regex_partial { $REGEXES{strict}->{partial} }
-sub strict_regex         { $REGEXES{strict}->{full} }
-sub regex_partial        { $REGEXES{lax}->{partial} }
-sub regex                { $REGEXES{lax}->{full} }
+sub valid_regex_partial  { $REGEXES{valid_partial_anchored_captures} }
+sub valid_regex          { $REGEXES{valid_anchored_captures} }
+sub strict_regex_partial { $REGEXES{strict_partial_anchored_captures} }
+sub strict_regex         { $REGEXES{strict_anchored_captures} }
+sub regex_partial        { $REGEXES{lax_partial_anchored_captures} }
+sub regex                { $REGEXES{lax_anchored_captures} }
 
-sub valid_regex_partial {
-    shift->_outcode_data() unless %OUTCODES_FOR_REGEX;
-    return $REGEXES{valid}->{partial};
-}
-
-sub valid_regex {
-    shift->_outcode_data() unless %OUTCODES_FOR_REGEX;
-    return $REGEXES{valid}->{full};
-}
 
 =head2 is_valid_pc, is_strict_pc, is_lax_pc
 
@@ -297,13 +282,13 @@ Alternative way to access the regexes.
 =cut
 
 sub is_valid_pc {
-    return shift =~ $REGEXES{valid}->{full} ? 1 : 0
+    return shift =~ $REGEXES{valid_anchored_captures} ? 1 : 0
 }
 sub is_strict_pc {
-    return shift =~ $REGEXES{strict}->{full} ? 1 : 0
+    return shift =~ $REGEXES{strict_anchored_captures} ? 1 : 0
 }
 sub is_lax_pc {
-    return shift =~ $REGEXES{lax}->{full} ? 1 : 0
+    return shift =~ $REGEXES{lax_anchored_captures} ? 1 : 0
 }
 
 =head2 extract
@@ -322,9 +307,9 @@ sub extract {
     $class->_outcode_data() unless %OUTCODES;
 
     my $re
-        = $options->{valid}  ? $REGEXES_UNANCHORED{valid}->{full}
-        : $options->{strict} ? $REGEXES_UNANCHORED{strict}->{full}
-        :                      $REGEXES_UNANCHORED{lax}->{full};
+        = $options->{valid}  ? $REGEXES{valid}
+        : $options->{strict} ? $REGEXES{strict}
+        :                      $REGEXES{lax};
 
     my @extracted = $string =~ m/($re)/g;
 
@@ -365,10 +350,10 @@ sub parse {
 
     $options ||= {};
 
-    my $size = $options->{partial} ? 'partial' : 'full';
+    my $size = $options->{partial} ? 'partial' : '';
 
     my ( $area, $district, $sector, $unit )
-        = $string =~ $REGEXES{strict}->{$size};
+        = $string =~ $REGEXES{"strict_${size}_anchored_captures"};
 
     my $strict = $area ? 1 : 0;    # matched strict?
 
@@ -376,7 +361,8 @@ sub parse {
         return if $options->{strict};
 
         # try lax regex
-        ( $area, $district, $sector, $unit ) = $string =~ $REGEXES{lax}->{$size}
+        ( $area, $district, $sector, $unit )
+            = $string =~ $REGEXES{"lax_${size}_anchored_captures"}
             or return;
     }
 
@@ -462,7 +448,7 @@ sub posttown_to_outcodes {
 
 =head2 outcodes_lookup
 
-    my %outcodes = %{ Geo::UK::Postcodes::Regex->outcodes_lookup };
+    my %outcodes = %{ Geo::UK::Postcode::Regex->outcodes_lookup };
     print "valid outcode" if $outcodes{$outcode};
     my @posttowns = @{ $outcodes{$outcode} };
 
@@ -470,7 +456,7 @@ Hashref of outcodes to posttown(s);
 
 =head2 posttowns_lookup
 
-    my %posttowns = %{ Geo::UK::Postcodes::Regex->posttowns_lookup };
+    my %posttowns = %{ Geo::UK::Postcode::Regex->posttowns_lookup };
     print "valid posttown" if $posttowns{$posttown};
     my @outcodes = @{ $[posttowns{$posttown} };
 
