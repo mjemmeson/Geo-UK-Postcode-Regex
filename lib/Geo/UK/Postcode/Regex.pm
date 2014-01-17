@@ -187,20 +187,24 @@ tie %REGEXES, 'Geo::UK::Postcode::Regex::Hash';
 sub _get_re {
     my ( $class, $key ) = @_;
 
-    $class->_outcode_data() if index( $key, 'valid' ) && !%OUTCODES;
+    $class->_outcode_data() if $key =~ m/valid/ && !%OUTCODES;
+
+    my $type = $key =~ m/lax/ ? 'lax' : 'strict';
+
+    my $components = $Geo::UK::Postcode::Regex::COMPONENTS{$type};
 
     my @comps
-        = index( $key, 'valid' )
-        ? @{$COMPONENTS}{qw/ outcodes blank sector unit /}
-        : @{$COMPONENTS}{qw/ area district sector unit /};
+        = $key =~ m/valid/
+        ? @{$components}{qw/ outcodes blank sector unit /}
+        : @{$components}{qw/ area district sector unit /};
 
-    @comps = map { $_ ? "($_)" : $_ } @comps if index( $key, 'captures' );
+    @comps = map { $_ ? "($_)" : $_ } @comps if $key =~ m/captures/;
 
-    my $size = index( $key, 'partial' ) ? 'partial' : 'full';
+    my $size = $key =~ m/partial/ ? 'partial' : 'full';
 
     my $re = sprintf( $BASE_REGEXES{$size}, @comps );
 
-    return index( $key, anchored ) ? qr/^$re$/x : qr/$re/x;
+    return $key =~ m/anchored/ ? qr/^$re$/x : qr/$re/x;
 }
 
 ## OUTCODE AND POSTTOWN DATA
@@ -219,7 +223,8 @@ sub _outcode_data {
             non_geographical => $non_geographical,
         };
 
-        my ( $area, $district ) = $outcode =~ $REGEXES{strict}->{partial}
+        my ( $area, $district )
+            = $outcode =~ $REGEXES{strict_partial_anchored_captures}
             or next;
 
         push @{ $OUTCODES_FOR_REGEX{$area} }, $district;
@@ -384,8 +389,11 @@ sub parse {
         outcode     => $outcode,
         incode      => ( $sector // '' ) . ( $unit || '' ),
         valid_outcode => $outcode_data ? 1 : 0,
-        strict        => $strict,
-        partial       => $unit         ? 0 : 1,
+
+        strict  => $strict,
+        partial => $unit ? 0 : 1,
+        valid   => $outcode_data && $strict ? 1 : 0,
+
         $outcode_data->{non_geographical} ? ( non_geographical => 1 ) : (),
         $outcode eq "BF1"                 ? ( bfpo             => 1 ) : (),
     };

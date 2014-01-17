@@ -21,58 +21,63 @@ ok my $strict_re_partial = $pkg->strict_regex_partial, "strict_regex_partial";
 ok my $valid_re_partial  = $pkg->valid_regex_partial,  "valid_regex_partial";
 
 foreach my $test ( TestGeoUKPostcode->test_pcs ) {
+    subtest(
+        $test->{raw} => sub {
 
-    foreach my $raw ( TestGeoUKPostcode->get_format_list($test) ) {
-
-        note $raw;
-
-        unless ( $test->{partial} ) {
-
-            if ( $test->{strict} ) {
-                ok is_strict_pc($raw), "is_strict_pc true";
-                ok $raw =~ $strict_re, "$raw matches strict regex";
-            } else {
-                ok !is_strict_pc($raw), "is_strict_pc false";
-                ok $raw !~ $strict_re, "$raw doesn't match strict regex";
-            }
-
-            if ( $test->{valid} && $test->{strict} ) {
-                ok is_valid_pc($raw), "is_valid_pc true";
-                ok $raw =~ $valid_re, "$raw matches valid regex";
-            } else {
-                ok !is_valid_pc($raw), "is_valid_pc false";
-                ok $raw !~ $valid_re, "$raw doesn't match valid regex";
-            }
-
-            if ( $test->{area} ) {
-                ok is_lax_pc($raw), "is_lax_pc true";
-                ok $raw =~ $re, "$raw matches lax regex";
-            } else {
-                ok !is_lax_pc($raw), "is_lax_pc false";
-                ok $raw !~ $re, "$raw doesn't match lax regex";
-            }
-
+            subtest( $_ => sub { test_regex( $test, $_ ) } )
+                foreach TestGeoUKPostcode->get_format_list($test);
         }
+    );
+}
 
-        if ( $test->{area} ) {
-            ok $raw =~ $re_partial, "$raw matches lax regex partial";
-        } else {
-            ok $raw !~ $re_partial, "$raw doesn't match lax regex partial";
-        }
+sub test_regex {
+    my ( $test, $raw ) = @_;
+
+    unless ( $test->{partial} ) {
 
         if ( $test->{strict} ) {
-            ok $raw =~ $strict_re_partial, "$raw matches strict regex partial";
+            ok is_strict_pc($raw), "is_strict_pc true";
+            ok $raw =~ $strict_re, "$raw matches strict regex";
         } else {
-            ok $raw !~ $strict_re_partial,
-                "$raw doesn't match strict regex partial";
+            ok !is_strict_pc($raw), "is_strict_pc false";
+            ok $raw !~ $strict_re, "$raw doesn't match strict regex";
         }
 
         if ( $test->{valid} && $test->{strict} ) {
-            ok $raw =~ $valid_re_partial, "$raw matches valid regex partial";
+            ok is_valid_pc($raw), "is_valid_pc true";
+            ok $raw =~ $valid_re, "$raw matches valid regex";
         } else {
-            ok $raw !~ $valid_re_partial,
-                "$raw doesn't match valid regex partial";
+            ok !is_valid_pc($raw), "is_valid_pc false";
+            ok $raw !~ $valid_re, "$raw doesn't match valid regex";
         }
+
+        if ( $test->{area} ) {
+            ok is_lax_pc($raw), "is_lax_pc true";
+            ok $raw =~ $re, "$raw matches lax regex";
+        } else {
+            ok !is_lax_pc($raw), "is_lax_pc false";
+            ok $raw !~ $re, "$raw doesn't match lax regex";
+        }
+
+    }
+
+    if ( $test->{area} ) {
+        ok $raw =~ $re_partial, "$raw matches lax regex partial";
+    } else {
+        ok $raw !~ $re_partial, "$raw doesn't match lax regex partial";
+    }
+
+    if ( $test->{strict} ) {
+        ok $raw =~ $strict_re_partial, "$raw matches strict regex partial";
+    } else {
+        ok $raw !~ $strict_re_partial,
+            "$raw doesn't match strict regex partial";
+    }
+
+    if ( $test->{valid} && $test->{strict} ) {
+        ok $raw =~ $valid_re_partial, "$raw matches valid regex partial";
+    } else {
+        ok $raw !~ $valid_re_partial, "$raw doesn't match valid regex partial";
     }
 }
 
