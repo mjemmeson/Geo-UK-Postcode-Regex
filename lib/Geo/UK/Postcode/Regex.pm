@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use base 'Exporter';
-our @EXPORT_OK = qw/ is_valid_pc is_strict_pc is_lax_pc /;
+our @EXPORT_OK = qw/ is_valid_pc is_strict_pc is_lax_pc %REGEXES /;
 
 # ABSTRACT: regular expressions for handling British postcodes
 
@@ -128,6 +128,22 @@ without whitespace.
 
 =cut
 
+{
+    # Use tied hash - creates regex if key missing
+    package Geo::UK::Postcode::Regex::Hash;
+
+    require Tie::Hash;
+
+    our @ISA = qw/ Tie::StdHash /;
+
+    sub TIEHASH { bless {}, shift }
+    sub FETCH {
+        my ($this,$key) = @_;
+        $this->{$key} //= Geo::UK::Postcode::Regex->_get_re( $key );
+        return $this->{$key};
+    }
+}
+
 ## REGULAR EXPRESSIONS
 
 my $AREA1 = 'ABCDEFGHIJKLMNOPRSTUWYZ';    # [^QVX]
@@ -163,21 +179,6 @@ my %BASE_REGEXES = (
     full          => ' %s %s     \s* %s %s      ',
     partial       => ' %s %s (?: \s* %s %s? ) ? ',
 );
-
-{
-    package Geo::UK::Postcode::Regex::Hash;
-
-    require Tie::Hash;
-
-    our @ISA = qw/ Tie::StdHash /;
-
-    sub TIEHASH { bless {}, shift }
-    sub FETCH {
-        my ($this,$key) = @_;
-        $this->{$key} //= Geo::UK::Postcode::Regex->_get_re( $key );
-        return $this->{$key};
-    }
-}
 
 my ( %POSTTOWNS, %OUTCODES, %OUTCODES_FOR_REGEX );
 
