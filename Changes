@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+  - debugging regexes
+  - added Simple.pm
+  - switched regex building to tied hash
+
 0.008     2014-01-15 16:36:51+00:00 Europe/London
 
   - fixing parse.t tests
