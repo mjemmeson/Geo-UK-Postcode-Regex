@@ -61,12 +61,14 @@ sub test_parse {
     is $parsed->{$_}, $test->{$_}, "$_ ok"
         foreach qw/ area district subdistrict sector unit outcode incode /;
 
-    is $parsed->{valid_outcode} || 0, $test->{valid} || 0,
-        $test->{valid}
+    my $valid_outcode = $test->{valid_outcode} || $test->{valid};
+    is $parsed->{valid_outcode} || 0,    #
+        $valid_outcode || 0,             #
+        $valid_outcode
         ? "postcode has valid_outcode"
         : "postcode doesn't have valid_outcode";
 
-    foreach (qw/ strict partial non_geographical bfpo /) {
+    foreach (qw/ strict partial valid non_geographical bfpo /) {
         is $parsed->{$_} || 0, $test->{$_} || 0,
             $test->{$_} ? "postcode is $_" : "postcode isn't $_";
     }
