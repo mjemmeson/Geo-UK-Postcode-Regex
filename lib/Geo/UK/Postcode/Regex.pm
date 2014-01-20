@@ -107,7 +107,7 @@ our @EXPORT_OK = qw/ is_valid_pc is_strict_pc is_lax_pc %REGEXES /;
 =head1 DESCRIPTION
 
 Parsing UK postcodes with regular expressions. This package has been
-separated from L<Geo::UK::Postcode> so it can be installed and used without
+separated from L<Geo::UK::Postcode> so it can be installed and used with fewer
 dependencies.
 
 Can handle partial postcodes (just the outcode or sector) and can test
@@ -124,7 +124,7 @@ When parsing a partial postcode, whitespace may be required to separate the
 outcode from the sector.
 
 For example the sector 'B1 1' cannot be distinguished from the district 'B11'
-without whitespace.
+without whitespace. This is not a problem when parsing full postcodes.
 
 =cut
 
@@ -272,10 +272,10 @@ or sector
 =cut
 
 sub valid_regex_partial  { $REGEXES{valid_partial_anchored_captures} }
-sub valid_regex          { $REGEXES{valid_anchored_captures} }
 sub strict_regex_partial { $REGEXES{strict_partial_anchored_captures} }
-sub strict_regex         { $REGEXES{strict_anchored_captures} }
 sub regex_partial        { $REGEXES{lax_partial_anchored_captures} }
+sub valid_regex          { $REGEXES{valid_anchored_captures} }
+sub strict_regex         { $REGEXES{strict_anchored_captures} }
 sub regex                { $REGEXES{lax_anchored_captures} }
 
 
@@ -288,13 +288,13 @@ Alternative way to access the regexes.
 =cut
 
 sub is_valid_pc {
-    return shift =~ $REGEXES{valid_anchored_captures} ? 1 : 0
+    return shift =~ $REGEXES{valid_anchored} ? 1 : 0
 }
 sub is_strict_pc {
-    return shift =~ $REGEXES{strict_anchored_captures} ? 1 : 0
+    return shift =~ $REGEXES{strict_anchored} ? 1 : 0
 }
 sub is_lax_pc {
-    return shift =~ $REGEXES{lax_anchored_captures} ? 1 : 0
+    return shift =~ $REGEXES{lax_anchored} ? 1 : 0
 }
 
 =head2 extract
@@ -356,10 +356,12 @@ sub parse {
 
     $options ||= {};
 
-    my $size = $options->{partial} ? 'partial' : '';
+    my $re
+        = $options->{partial}
+        ? 'partial_anchored_captures'
+        : 'anchored_captures';
 
-    my ( $area, $district, $sector, $unit )
-        = $string =~ $REGEXES{"strict_${size}_anchored_captures"};
+    my ( $area, $district, $sector, $unit ) = $string =~ $REGEXES{"strict_$re"};
 
     my $strict = $area ? 1 : 0;    # matched strict?
 
@@ -367,8 +369,7 @@ sub parse {
         return if $options->{strict};
 
         # try lax regex
-        ( $area, $district, $sector, $unit )
-            = $string =~ $REGEXES{"lax_${size}_anchored_captures"}
+        ( $area, $district, $sector, $unit ) = $string =~ $REGEXES{"lax_$re"}
             or return;
     }
 
