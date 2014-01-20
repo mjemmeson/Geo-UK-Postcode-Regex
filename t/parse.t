@@ -1,7 +1,6 @@
 # parse.t
 
-use
-Test::More;
+use Test::More;
 
 use strict;
 use warnings;
@@ -9,11 +8,8 @@ use warnings;
 use lib 't/lib';
 use TestGeoUKPostcode;
 
-use Data::Dumper;
 use Clone qw/ clone /;
 use Geo::UK::Postcode::Regex;
-
-local $Data::Dumper::Sortkeys = 1;
 
 my $pkg = 'Geo::UK::Postcode::Regex';
 
