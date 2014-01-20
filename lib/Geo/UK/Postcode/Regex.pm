@@ -130,14 +130,14 @@ without whitespace.
 
 ## REGULAR EXPRESSIONS
 
-my $AREA1 = 'ABCDEFGHIJKLMNOPRSTUWYZ';    # [^QVX]
-my $AREA2 = 'ABCDEFGHKLMNOPQRSTUVWXY';    # [^IJZ]
+my $AREA1 = 'ABCDEFGHIJKLMNOP RSTU W YZ';    # [^QVX]
+my $AREA2 = 'ABCDEFGH  KLMNOPQRSTUVWXY ';    # [^IJZ]
 
-my $SUBDISTRICT1 = 'ABCDEFGHJKPSTUW';     # for single letter areas
-my $SUBDISTRICT2 = 'ABEHMNPRVWXY';        # for two letter areas
+my $SUBDISTRICT1 = 'ABCDEFGHJKPSTUW';        # for single letter areas
+my $SUBDISTRICT2 = 'ABEHMNPRVWXY';           # for two letter areas
 
-my $UNIT1 = 'ABDEFGHJLNPQRSTUWXYZ';       # [^CIKMOV]
-my $UNIT2 = 'ABDEFGHJLNPQRSTUWXYZ';       # [^CIKMOV]
+my $UNIT1 = 'AB DEFGH J L N PQRSTU WXYZ';    # [^CIKMOV]
+my $UNIT2 = 'AB DEFGH J L N PQRSTU WXYZ';    # [^CIKMOV]
 
 my %COMPONENTS = (
     strict => {
