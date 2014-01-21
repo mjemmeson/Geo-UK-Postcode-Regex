@@ -180,7 +180,7 @@ my %BASE_REGEXES = (
     partial       => ' %s %s (?: \s* %s %s? ) ? ',
 );
 
-my ( %POSTTOWNS, %OUTCODES, %OUTCODES_FOR_REGEX );
+my ( %POSTTOWNS, %OUTCODES );
 
 our %REGEXES;
 tie %REGEXES, 'Geo::UK::Postcode::Regex::Hash';
@@ -213,6 +213,8 @@ sub _get_re {
 sub _outcode_data {
     my $class = shift;
 
+    my %area_districts;
+
     while ( my $line = <DATA> ) {
         next unless $line =~ m/\w/;
         chomp $line;
@@ -228,7 +230,7 @@ sub _outcode_data {
             = $outcode =~ $REGEXES{strict_partial_anchored_captures}
             or next;
 
-        push @{ $OUTCODES_FOR_REGEX{$area} }, $district;
+        push @{ $area_districts{$area} }, $district;
     }
 
     # Add in BX non-geographical outcodes
@@ -237,7 +239,7 @@ sub _outcode_data {
             posttowns        => [],
             non_geographical => 1,
         };
-        push @{ $OUTCODES_FOR_REGEX{BX} }, $_;
+        push @{ $area_districts{BX} }, $_;
     }
 
     $Geo::UK::Postcode::Regex::COMPONENTS{strict}->{outcodes} = '(?: ' . join(
@@ -245,9 +247,9 @@ sub _outcode_data {
         map {
             sprintf(
                 "%s(?:%s)",    #
-                $_, join( '|', @{ $OUTCODES_FOR_REGEX{$_} } )
+                $_, join( '|', @{ $area_districts{$_} } )
                 )
-        } sort keys %OUTCODES_FOR_REGEX
+        } sort keys %area_districts
     ) . ' )';
 }
 
