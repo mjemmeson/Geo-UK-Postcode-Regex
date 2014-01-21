@@ -146,8 +146,8 @@ without whitespace. This is not a problem when parsing full postcodes.
 
 ## REGULAR EXPRESSIONS
 
-my $AREA1 = 'ABCDEFGHIJKLMNOPRSTUWYZ';     # [^QVX]
-my $AREA2 = 'ABCDEFGHKLMNOPQRSTUVWXY ';    # [^IJZ]
+my $AREA1 = 'ABCDEFGHIJKLMNOPRSTUWYZ';    # [^QVX]
+my $AREA2 = 'ABCDEFGHKLMNOPQRSTUVWXY';    # [^IJZ]
 
 my $SUBDISTRICT1 = 'ABCDEFGHJKPSTUW';      # for single letter areas
 my $SUBDISTRICT2 = 'ABEHMNPRVWXY';         # for two letter areas
@@ -215,6 +215,7 @@ sub _outcode_data {
 
     my %area_districts;
 
+    # Get outcodes from __DATA__
     while ( my $line = <DATA> ) {
         next unless $line =~ m/\w/;
         chomp $line;
@@ -225,12 +226,6 @@ sub _outcode_data {
             posttowns        => \@posttowns,
             non_geographical => $non_geographical,
         };
-
-        my ( $area, $district )
-            = $outcode =~ $REGEXES{strict_partial_anchored_captures}
-            or next;
-
-        push @{ $area_districts{$area} }, $district;
     }
 
     # Add in BX non-geographical outcodes
@@ -239,18 +234,38 @@ sub _outcode_data {
             posttowns        => [],
             non_geographical => 1,
         };
-        push @{ $area_districts{BX} }, $_;
+    }
+
+    foreach my $outcode ( sort keys %OUTCODES ) {
+        my ( $area, $district )
+            = $outcode =~ $REGEXES{strict_partial_anchored_captures}
+            or next;
+
+        $district = " $district" if length $district < 2;
+
+        push @{ $area_districts{$area}->{ substr( $district, 0, 1 ) } },
+            substr( $district, 1, 1 );
     }
 
     $Geo::UK::Postcode::Regex::COMPONENTS{strict}->{outcodes} = '(?: ' . join(
         "|\n",
         map {
+            my $area = $_;
             sprintf(
-                "%s(?:%s)",    #
-                $_, join( '|', @{ $area_districts{$_} } )
+                "%s (?:%s)",    #
+                $area,
+                join(
+                    ' | ',
+                    map {
+                              $_ . '['
+                            . join( '', @{ $area_districts{$area}->{$_} } )
+                            . ']'
+                    } sort keys %{ $area_districts{$area} }
+                )
                 )
         } sort keys %area_districts
     ) . ' )';
+
 }
 
 =head1 METHODS
