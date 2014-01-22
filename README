@@ -6,6 +6,8 @@ VERSION
     version 0.009
 
 SYNOPSIS
+    See Geo::UK::Postcode::Regex::Simple for an alternative interface.
+
         use Geo::UK::Postcode::Regex;
 
         ## REGULAR EXPRESSIONS
@@ -99,8 +101,8 @@ SYNOPSIS
 
 DESCRIPTION
     Parsing UK postcodes with regular expressions. This package has been
-    separated from Geo::UK::Postcode so it can be installed and used without
-    dependencies.
+    separated from Geo::UK::Postcode so it can be installed and used with
+    fewer dependencies.
 
     Can handle partial postcodes (just the outcode or sector) and can test
     against valid characters and currently valid outcodes.
@@ -115,7 +117,8 @@ NOTES AND LIMITATIONS
     the outcode from the sector.
 
     For example the sector 'B1 1' cannot be distinguished from the district
-    'B11' without whitespace.
+    'B11' without whitespace. This is not a problem when parsing full
+    postcodes.
 
 METHODS
   regex, strict_regex, valid_regex
@@ -228,7 +231,7 @@ AUTHOR
     Michael Jemmeson <mjemmeson@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2013 by Michael Jemmeson.
+    This software is copyright (c) 2014 by Michael Jemmeson.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

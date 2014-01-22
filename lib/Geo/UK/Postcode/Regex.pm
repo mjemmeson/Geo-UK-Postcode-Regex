@@ -12,6 +12,8 @@ our @EXPORT_OK = qw/ is_valid_pc is_strict_pc is_lax_pc %REGEXES /;
 
 =head1 SYNOPSIS
 
+See L<Geo::UK::Postcode::Regex::Simple> for an alternative interface.
+
     use Geo::UK::Postcode::Regex;
 
     ## REGULAR EXPRESSIONS
@@ -305,13 +307,16 @@ Alternative way to access the regexes.
 =cut
 
 sub is_valid_pc {
-    return shift =~ $REGEXES{valid_anchored} ? 1 : 0
+    my $pc = @_ > 1 ? $_[1] : $_[0];
+    return $pc =~ $REGEXES{valid_anchored} ? 1 : 0
 }
 sub is_strict_pc {
-    return shift =~ $REGEXES{strict_anchored} ? 1 : 0
+    my $pc = @_ > 1 ? $_[1] : $_[0];
+    return $pc =~ $REGEXES{strict_anchored} ? 1 : 0
 }
 sub is_lax_pc {
-    return shift =~ $REGEXES{lax_anchored} ? 1 : 0
+    my $pc = @_ > 1 ? $_[1] : $_[0];
+    return $pc =~ $REGEXES{lax_anchored} ? 1 : 0
 }
 
 =head2 extract

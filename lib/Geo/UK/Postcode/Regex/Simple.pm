@@ -90,25 +90,121 @@ sub validate_pc {
         :                     croak "Invalid \$MODE: $MODE";
 }
 
+1;
+
+__END__
+
 =head1 NAME
 
 Geo::UK::Postcode::Regex::Simple
 
 =head1 SYNOPSIS
 
-    use Geo::UK::Postcode::Regex::Simple
-        qw/ postcode_re parse_pc extract_pc validate_pc /;
+    use Geo::UK::Postcode::Regex::Simple ':all';
 
+    # Set behaviour of regular expression (defaults below)
+    local $Geo::UK::Postcode::Regex::Simple::MODE     = 'strict';
+    local $Geo::UK::Postcode::Regex::Simple::PARTIAL  = 0;
+    local $Geo::UK::Postcode::Regex::Simple::CAPTURES = 1;
+    local $Geo::UK::Postcode::Regex::Simple::ANCHORED = 1;
 
+    # Regular expression to match postcodes
     my $re = postcode_re;
+    my ( $area, $district, $sector, $unit ) = "AB10 1AA" =~ re;
 
+    # Get hashref of data parsed from postcode
+    my $parsed = parse_pc "AB10 1AA";
 
+    # Extract list of postcodes from text string
+    my @extracted = extract_pc $text;
+
+    # Check if string is a correct postcode 
+    if ( validate_pc $string ) {
+        ...
+    }
+
+Alternate global configuration:
+
+    use Geo::UK::Postcode::Regex::Simple    #
+        -strict                             # or -lax, -valid
+        -full                               # or -partial
+        -anchored                           # or -unanchored
+        -captures                           # or -nocaptures
+        ;
 
 =head1 DESCRIPTION
 
+Alternative interface to L<Geo::UK::Postcode::Regex>.
 
+=head1 CONFIGURATION
+
+=head2 MODE
+
+Sets the regular expressions used to be in one of the following modes:
+
+=over
+
+=item lax
+
+Matches anything that resembles a postcode.
+
+=item strict (default)
+
+Matches only if postcode contains valid characters in the correct
+positions.
+
+=item valid
+
+Matches only if the postcode contains valid characters and the outcode exists.
+
+=back
+
+=head2 PARTIAL (default = false )
+
+If true, regular expression returned by C<postcode_re> will match partial
+postcodes, at district (outcode) or sector level, e.g. "AB10" or "AB10 1".
+
+=head2 ANCHORED (default = true )
+
+Puts anchors (C<^> and C<$>) around the regular expression returned by
+C<postcode_re>.
+
+=head2 CAPTURES (default = true )
+
+Puts capture groups into the regular expression returned by C<postcode_re>. The
+matches returned upon a successful match are: area, district, sector and unit.
+
+=head1 FUNCTIONS
+
+=head2 postcode_re
+
+    my $re = postcode_re;
+
+Returns a regular expression which will match UK Postcodes. See CONFIGURATION
+for details.
+
+=head2 parse_pc
+
+    my $parsed = parse_pc $pc;
+
+Returns a hashref of data extracted from the postcode. See C<parse> in
+L<Geo::UK::Postcode::Regex> for more details.
+
+=head2 extract_pc
+
+    my @extracted = extract_pc $test;
+
+Returns a list of postcodes extracted from a text string. See C<extract> in
+L<Geo::UK::Postcode::Regex> for more details.
+
+=head2 validate_pc
+
+    if ( validate_pc $pc ) {
+        ...
+    }
+
+Boolean test for if a string is a valid postcode or not, according to current
+MODE (see CONFIGURATION).
 
 =cut
-
-1;
 
