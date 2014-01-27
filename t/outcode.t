@@ -18,6 +18,9 @@ is $pkg->outcode('B1'),       'B1',   "district";
 is $pkg->outcode('WC1H 9EB'), 'WC1H', "with subdistrict";
 is $pkg->outcode('WC1H9EB'),  'WC1H', "with subdistrict - no space";
 
+note "case-insensitive";
+is $pkg->outcode( 'ab10 1aa', { 'case-insensitive' => 1 } ), 'AB10', "full";
+
 note "full only";
 is $pkg->outcode( 'AB10 1AA', { partial => 0 } ), 'AB10', "full";
 ok !$pkg->outcode( 'AB10', { partial => 0 } ), 'partial fails';

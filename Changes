@@ -2,6 +2,9 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+  - Feature: case-insensitive matching
+  - POD - methods grouped
+
 0.009     2014-01-22 18:20:34+00:00 Europe/London
 
   - debugging regexes

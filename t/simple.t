@@ -44,6 +44,13 @@ subtest(
             ok my @matches = 'AB10 1AA' =~ $re, "regex ok with no captures";
             is_deeply \@matches, [1], "no matches, only true value";
         }
+
+        {
+            local $Geo::UK::Postcode::Regex::Simple::CASE_INSENSITIVE = 1;
+            ok $re = postcode_re, "got case-insensitive postcode regex";
+            ok 'ab10 1aa' =~ $re, "regex ok with lower case postcode";
+            ok 'AB10 1AA' =~ $re, "regex ok with upper case postcode";
+        }
     }
 );
 

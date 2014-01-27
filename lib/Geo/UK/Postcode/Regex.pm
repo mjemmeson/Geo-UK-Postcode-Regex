@@ -272,7 +272,12 @@ sub _outcode_data {
 
 }
 
-=head1 METHODS
+=head1 VALIDATION METHODS
+
+The following methods are for validating postcodes to various degrees.
+
+L<Geo::UK::Postcode::Regex::Simple> may provide a more convenient way of using
+and customising these.
 
 =head2 regex, strict_regex, valid_regex
 
@@ -321,6 +326,35 @@ sub is_lax_pc {
     return $pc =~ $REGEXES{lax_anchored} ? 1 : 0
 }
 
+=head1 PARSING METHODS
+
+The following methods are for parsing postcodes or strings containing postcodes.
+
+=head2 PARSING_OPTIONS
+
+The parsing methods can take the following options, passed via a hashref:
+
+=over
+
+=item strict
+
+Postcodes must not contain invalid characters according to the postcode
+specification. For example a 'Q' may not appear as the first character.
+
+=item valid
+
+Postcodes must contain an outcode (area + district) that currently exists, in
+addition to conforming to the C<strict> definition.
+
+Returns false if string is not a currently existing outcode.
+
+=item partial
+
+Allows partial postcodes to be matched. In practice this means either an outcode
+( area and district ) or an outcode together with the sector.
+
+=back
+
 =head2 extract
 
     my @extracted = Geo::UK::Postcode::Regex->extract( $string, \%options );
@@ -336,12 +370,14 @@ sub extract {
 
     $class->_outcode_data() unless %OUTCODES;
 
-    my $re
-        = $options->{valid}  ? $REGEXES{'valid_case-insensitive'}
-        : $options->{strict} ? $REGEXES{'strict_case-insensitive'}
-        :                      $REGEXES{'lax_case-insensitive'};
+    my $key
+        = $options->{valid}  ? 'valid'
+        : $options->{strict} ? 'strict'
+        :                      'lax';
 
-    my @extracted = $string =~ m/($re)/g;
+    $key .= '_case-insensitive' if $options->{'case-insensitive'};
+
+    my @extracted = $string =~ m/($REGEXES{$key})/g;
 
     return map {uc} @extracted;
 }
@@ -349,29 +385,9 @@ sub extract {
 
 =head2 parse
 
-    my $parsed = Geo::UK::Postcode::Regex->parse( $pc, \%opts );
+    my $parsed = Geo::UK::Postcode::Regex->parse( $pc, \%options );
 
 Returns hashref of the constituent parts.
-
-Options:
-
-=over
-
-=item strict
-
-Returns false if string contains invalid characters (e.g. a Q as first letter)
-
-=item valid
-
-Returns false if string is not a currently existing outcode.
-
-=item partial
-
-Allows partial postcodes to be matched. In practice this means either an outcode
-( area and district )
-or an outcode together with the sector .
-
-=back
 
 =cut
 
@@ -380,10 +396,12 @@ sub parse {
 
     $options ||= {};
 
+    my $case = $options->{'case-insensitive'} ? '_case-insensitive' : '';
+
     my $re
         = $options->{partial}
-        ? 'partial_anchored_captures'
-        : 'anchored_captures';
+        ? 'partial_anchored_captures' . $case
+        : 'anchored_captures' . $case;
 
     my ( $area, $district, $sector, $unit ) = $string =~ $REGEXES{"strict_$re"};
 
@@ -399,6 +417,8 @@ sub parse {
 
     return unless $unit || $options->{partial};
 
+    $_ = uc( $_ // '' ) foreach ( $area, $district, $sector, $unit );
+
     my $outcode      = $area . $district;
     my $outcode_data = $class->outcodes_lookup->{$outcode};
 
@@ -407,13 +427,13 @@ sub parse {
     my $subdistrict = $district =~ s/([A-Z])$// ? $1 : undef;
 
     return {
-        area        => $area,
-        district    => $district,
-        subdistrict => $subdistrict,
-        sector      => $sector,
-        unit        => $unit,
-        outcode     => $outcode,
-        incode      => ( $sector // '' ) . ( $unit || '' ),
+        area          => $area,
+        district      => $district,
+        subdistrict   => $subdistrict,
+        sector        => $sector,
+        unit          => $unit,
+        outcode       => $outcode,
+        incode        => $sector . $unit,
         valid_outcode => $outcode_data ? 1 : 0,
 
         strict  => $strict,
@@ -427,12 +447,10 @@ sub parse {
 
 =head2 outcode
 
-    my $outcode = Geo::UK::Postcode::Regex->outcode( $pc, \%opts );
+    my $outcode = Geo::UK::Postcode::Regex->outcode( $pc, \%options );
 
 Extract the outcode (area and district) from a postcode string. Will work on
 full or partial postcodes.
-
-Second argument is a hashref of options - see C<parse()>
 
 =cut
 
@@ -444,6 +462,8 @@ sub outcode {
 
     return $parsed->{outcode};
 }
+
+=head1 LOOKUP METHODS
 
 =head2 outcode_to_posttowns
 

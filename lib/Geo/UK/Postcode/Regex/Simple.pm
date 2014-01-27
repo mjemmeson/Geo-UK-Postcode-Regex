@@ -16,10 +16,11 @@ use Geo::UK::Postcode::Regex qw/ %REGEXES /;
 our @EXPORT_OK = qw/ postcode_re extract_pc parse_pc validate_pc /;
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $MODE     = 'strict'; # or valid or lax
-our $PARTIAL  = 0;
-our $ANCHORED = 1;
-our $CAPTURES = 1;
+our $MODE             = 'strict';    # or valid or lax
+our $PARTIAL          = 0;
+our $ANCHORED         = 1;
+our $CAPTURES         = 1;
+our $CASE_INSENSITIVE = 0;
 
 sub import {
     my $class = shift;
@@ -45,6 +46,11 @@ sub import {
         : delete $tags{'-nocaptures'} ? 1
         :                               $CAPTURES;
 
+    $CASE_INSENSITIVE
+        = delete $tags{'-case-insensitive'} ? 1
+        : delete $tags{'-case-sensitive'}   ? 0
+        :                                     $CASE_INSENSITIVE;
+
     local $Exporter::ExportLevel = 1;
     $class->SUPER::import( keys %tags );
 }
@@ -54,9 +60,10 @@ sub postcode_re {
     croak "invalid \$MODE $MODE" if $MODE !~ m/^(?:strict|lax|valid)$/;
 
     my $key = $MODE;
-    $key .= '_partial'  if $PARTIAL;
-    $key .= '_anchored' if $ANCHORED;
-    $key .= '_captures' if $CAPTURES;
+    $key .= '_partial'          if $PARTIAL;
+    $key .= '_anchored'         if $ANCHORED;
+    $key .= '_captures'         if $CAPTURES;
+    $key .= '_case-insensitive' if $CASE_INSENSITIVE;
 
     return $REGEXES{$key};
 }

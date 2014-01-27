@@ -45,7 +45,8 @@ sub test_extract {
 
     $string = join( ' abc ', @lc_list );
 
-    @extracted = $pkg->extract( $string, $options );
+    @extracted
+        = $pkg->extract( $string, { %{$options}, 'case-insensitive' => 1 } );
     ok scalar(@extracted), "extracted ok";
 
     is_deeply \@extracted, \@list, "extracted postcodes match list";
