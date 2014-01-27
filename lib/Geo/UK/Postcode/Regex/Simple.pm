@@ -71,9 +71,10 @@ sub postcode_re {
 sub parse_pc {
     Geo::UK::Postcode::Regex->parse(
         shift,
-        {   partial => $PARTIAL         ? 1 : 0,
-            strict  => $MODE eq 'lax'   ? 0 : 1,
-            valid   => $MODE eq 'valid' ? 1 : 0
+        {   partial            => $PARTIAL          ? 1 : 0,
+            strict             => $MODE eq 'lax'    ? 0 : 1,
+            valid              => $MODE eq 'valid'  ? 1 : 0,
+            'case-insensitive' => $CASE_INSENSITIVE ? 1 : 0,
         }
     );
 }
@@ -81,8 +82,9 @@ sub parse_pc {
 sub extract_pc {
     Geo::UK::Postcode::Regex->extract(
         shift,
-        {   strict => $MODE eq 'lax'   ? 0 : 1,
-            valid  => $MODE eq 'valid' ? 1 : 0
+        {   strict             => $MODE eq 'lax'    ? 0 : 1,
+            valid              => $MODE eq 'valid'  ? 1 : 0,
+            'case-insensitive' => $CASE_INSENSITIVE ? 1 : 0,
         }
     );
 }
@@ -90,11 +92,17 @@ sub extract_pc {
 sub validate_pc {
     my $pc = shift;
 
-    return
-          $MODE eq 'valid'  ? Geo::UK::Postcode::Regex->is_valid_pc($pc)
-        : $MODE eq 'strict' ? Geo::UK::Postcode::Regex->is_strict_pc($pc)
-        : $MODE eq 'lax'    ? Geo::UK::Postcode::Regex->is_lax_pc($pc)
-        :                     croak "Invalid \$MODE: $MODE";
+    croak "invalid \$MODE $MODE" if $MODE !~ m/^(?:strict|lax|valid)$/;
+
+    my $key = $MODE;
+
+    $key .= '_anchored' if $ANCHORED;
+
+    # TODO does partial make sense?
+
+    $key .= '_case-insensitive' if $CASE_INSENSITIVE;
+
+    return $pc =~ $REGEXES{$key} ? 1 : 0;
 }
 
 1;
@@ -110,10 +118,11 @@ Geo::UK::Postcode::Regex::Simple
     use Geo::UK::Postcode::Regex::Simple ':all';
 
     # Set behaviour of regular expression (defaults below)
-    local $Geo::UK::Postcode::Regex::Simple::MODE     = 'strict';
-    local $Geo::UK::Postcode::Regex::Simple::PARTIAL  = 0;
-    local $Geo::UK::Postcode::Regex::Simple::CAPTURES = 1;
-    local $Geo::UK::Postcode::Regex::Simple::ANCHORED = 1;
+    local $Geo::UK::Postcode::Regex::Simple::MODE             = 'strict';
+    local $Geo::UK::Postcode::Regex::Simple::PARTIAL          = 0;
+    local $Geo::UK::Postcode::Regex::Simple::CAPTURES         = 1;
+    local $Geo::UK::Postcode::Regex::Simple::ANCHORED         = 1;
+    local $Geo::UK::Postcode::Regex::Simple::CASE_INSENSITIVE = 0;
 
     # Regular expression to match postcodes
     my $re = postcode_re;
@@ -137,6 +146,7 @@ Alternate global configuration:
         -full                               # or -partial
         -anchored                           # or -unanchored
         -captures                           # or -nocaptures
+        -case-sensitive                     # or -case-insensitive
         ;
 
 =head1 DESCRIPTION
@@ -180,6 +190,13 @@ C<postcode_re>.
 
 Puts capture groups into the regular expression returned by C<postcode_re>. The
 matches returned upon a successful match are: area, district, sector and unit.
+
+=head2 CASE_INSENSITIVE (default = false)
+
+If false, only parses/matches/extracts postcodes that contain only upper case
+characters.
+
+NOTE C<validate_pc> is always case sensitive
 
 =head1 FUNCTIONS
 

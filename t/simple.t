@@ -71,5 +71,42 @@ subtest(
     }
 );
 
+subtest(
+    extract => sub {
+
+        note "with defaults";
+        ok my @extracted = extract_pc "my postcodes are AB10 1AA and wc1A 9zz.",
+            "extract_pc";
+        is_deeply \@extracted, ['AB10 1AA'];
+
+        {
+            local $Geo::UK::Postcode::Regex::Simple::CASE_INSENSITIVE = 1;
+            note "case-insensitive";
+            ok my @extracted
+                = extract_pc "my postcodes are AB10 1AA and wc1A 9zz.",
+                "extract_pc";
+            is_deeply \@extracted, [ 'AB10 1AA', 'WC1A 9ZZ' ];
+        }
+    }
+);
+
+subtest(
+    validate_pc => sub {
+        note "with defaults";
+        ok validate_pc("AB10 1AA");
+        ok !validate_pc("XX10 1AA");
+        ok !validate_pc("ab10 1aa");
+
+        {
+            local $Geo::UK::Postcode::Regex::Simple::CASE_INSENSITIVE = 1;
+            note "case-insensitive";
+            ok validate_pc("AB10 1AA");
+            ok !validate_pc("XX10 1AA");
+            ok validate_pc("ab10 1aa");
+        }
+
+    }
+);
+
 done_testing();
 
