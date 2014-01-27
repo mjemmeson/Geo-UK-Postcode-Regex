@@ -28,11 +28,24 @@ sub test_extract {
 
     my @pcs = grep { $_->{area} } TestGeoUKPostcode->test_pcs($options);
 
+    note "upper case";
+
     my @list = map { TestGeoUKPostcode->get_format_list($_) } @pcs;
 
     my $string = join( ' abc ', @list );
 
     my @extracted = $pkg->extract( $string, $options );
+    ok scalar(@extracted), "extracted ok";
+
+    is_deeply \@extracted, \@list, "extracted postcodes match list";
+
+    note "lower case";
+
+    my @lc_list = map { TestGeoUKPostcode->get_lc_format_list($_) } @pcs;
+
+    $string = join( ' abc ', @lc_list );
+
+    @extracted = $pkg->extract( $string, $options );
     ok scalar(@extracted), "extracted ok";
 
     is_deeply \@extracted, \@list, "extracted postcodes match list";

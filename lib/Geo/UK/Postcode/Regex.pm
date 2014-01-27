@@ -207,7 +207,9 @@ sub _get_re {
 
     my $re = sprintf( $BASE_REGEXES{$size}, @comps );
 
-    return $key =~ m/anchored/ ? qr/^$re$/x : qr/$re/x;
+    $re = '^' . $re . '$' if $key =~ m/anchored/;
+
+    return $key =~ m/case-insensitive/ ? qr/$re/ix : qr/$re/x;
 }
 
 ## OUTCODE AND POSTTOWN DATA
@@ -335,13 +337,13 @@ sub extract {
     $class->_outcode_data() unless %OUTCODES;
 
     my $re
-        = $options->{valid}  ? $REGEXES{valid}
-        : $options->{strict} ? $REGEXES{strict}
-        :                      $REGEXES{lax};
+        = $options->{valid}  ? $REGEXES{'valid_case-insensitive'}
+        : $options->{strict} ? $REGEXES{'strict_case-insensitive'}
+        :                      $REGEXES{'lax_case-insensitive'};
 
     my @extracted = $string =~ m/($re)/g;
 
-    return @extracted;
+    return map {uc} @extracted;
 }
 
 

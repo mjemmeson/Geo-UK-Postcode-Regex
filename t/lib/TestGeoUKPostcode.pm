@@ -357,5 +357,11 @@ sub get_format_list {
     return @list;
 }
 
+sub get_lc_format_list {
+    my ( $class, $pc ) = @_;
+
+    return map {lc} $class->get_format_list($pc);
+}
+
 1;
 
