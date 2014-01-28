@@ -1,6 +1,6 @@
 package Geo::UK::Postcode::Regex::Simple;
 
-# VERSION
+our $VERSION = '0.009';
 
 # ABSTRACT: Simplified interface to Geo::UK::Postcode::Regex
 
@@ -227,8 +227,21 @@ L<Geo::UK::Postcode::Regex> for more details.
         ...
     }
 
-Boolean test for if a string is a valid postcode or not, according to current
+Boolean test for if a string is a (full) postcode or not, according to current
 MODE (see CONFIGURATION).
+
+=head1 AUTHOR
+
+Michael Jemmeson E<lt>mjemmeson@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2014- Michael Jemmeson
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 

@@ -43,7 +43,7 @@ foreach (@tests) {
                 note "lower case";
                 $options->{'case-insensitive'} = 1;
 
-                my @raw_list = TestGeoUKPostcode->get_lc_format_list($expected);
+                @raw_list = TestGeoUKPostcode->get_lc_format_list($expected);
 
                 subtest( $_ => sub { test_parse( $_, $options, $expected ) } )
                     foreach @raw_list;

@@ -3,12 +3,20 @@ package Geo::UK::Postcode::Regex;
 use strict;
 use warnings;
 
+use Geo::UK::Postcode::Regex::Hash;
+
 use base 'Exporter';
 our @EXPORT_OK = qw/ is_valid_pc is_strict_pc is_lax_pc %REGEXES /;
 
+our $VERSION = '0.009';
+
 # ABSTRACT: regular expressions for handling British postcodes
 
-# VERSION
+=encoding utf-8
+
+=head1 NAME
+
+Geo::UK::Postcode::Regex
 
 =head1 SYNOPSIS
 
@@ -130,22 +138,6 @@ without whitespace. This is not a problem when parsing full postcodes.
 
 =cut
 
-{
-    # Use tied hash - creates regex if key missing
-    package Geo::UK::Postcode::Regex::Hash;
-
-    require Tie::Hash;
-
-    our @ISA = qw/ Tie::StdHash /;
-
-    sub TIEHASH { bless {}, shift }
-    sub FETCH {
-        my ($this,$key) = @_;
-        $this->{$key} //= Geo::UK::Postcode::Regex->_get_re( $key );
-        return $this->{$key};
-    }
-}
-
 ## REGULAR EXPRESSIONS
 
 my $AREA1 = 'ABCDEFGHIJKLMNOPRSTUWYZ';    # [^QVX]
@@ -184,8 +176,9 @@ my %BASE_REGEXES = (
 
 my ( %POSTTOWNS, %OUTCODES );
 
-our %REGEXES;
-tie %REGEXES, 'Geo::UK::Postcode::Regex::Hash';
+tie our %REGEXES, 'Geo::UK::Postcode::Regex::Hash', _fetch => sub {
+    Geo::UK::Postcode::Regex->_get_re(shift);
+};
 
 sub _get_re {
     my ( $class, $key ) = @_;
@@ -382,7 +375,6 @@ sub extract {
     return map {uc} @extracted;
 }
 
-
 =head2 parse
 
     my $parsed = Geo::UK::Postcode::Regex->parse( $pc, \%options );
@@ -563,6 +555,19 @@ L<CGI::Untaint::uk_postcode>
 L<Form::Validator::UKPostcode>
 
 =back
+
+=head1 AUTHOR
+
+Michael Jemmeson E<lt>mjemmeson@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2014- Michael Jemmeson
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
