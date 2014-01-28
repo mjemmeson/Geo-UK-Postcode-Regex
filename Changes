@@ -2,8 +2,13 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
-  - Feature: case-insensitive matching, and allow options on validate_pc
+  [Features]
+  - Case-insensitive matching, and allow options on validate_pc
+
+  [Maintenance]  
   - POD - methods grouped
+  - Switched to Dist::Milla
+  - moved tied hash to separate file
 
 0.009     2014-01-22 18:20:34+00:00 Europe/London
 

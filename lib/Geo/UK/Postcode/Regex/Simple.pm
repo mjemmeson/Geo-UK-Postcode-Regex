@@ -196,8 +196,6 @@ matches returned upon a successful match are: area, district, sector and unit.
 If false, only parses/matches/extracts postcodes that contain only upper case
 characters.
 
-NOTE C<validate_pc> is always case sensitive
-
 =head1 FUNCTIONS
 
 =head2 postcode_re
