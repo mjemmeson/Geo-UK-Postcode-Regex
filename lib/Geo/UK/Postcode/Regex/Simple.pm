@@ -1,6 +1,6 @@
 package Geo::UK::Postcode::Regex::Simple;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 # ABSTRACT: Simplified interface to Geo::UK::Postcode::Regex
 
