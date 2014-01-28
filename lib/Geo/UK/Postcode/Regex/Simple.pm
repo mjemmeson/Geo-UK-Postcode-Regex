@@ -2,8 +2,6 @@ package Geo::UK::Postcode::Regex::Simple;
 
 our $VERSION = '0.010';
 
-# ABSTRACT: Simplified interface to Geo::UK::Postcode::Regex
-
 use strict;
 use warnings;
 
@@ -111,7 +109,7 @@ __END__
 
 =head1 NAME
 
-Geo::UK::Postcode::Regex::Simple
+Geo::UK::Postcode::Regex::Simple - Simplified interface to Geo::UK::Postcode::Regex
 
 =head1 SYNOPSIS
 
