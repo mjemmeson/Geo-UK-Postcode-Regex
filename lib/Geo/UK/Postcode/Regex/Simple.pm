@@ -124,7 +124,7 @@ Geo::UK::Postcode::Regex::Simple - Simplified interface to Geo::UK::Postcode::Re
 
     # Regular expression to match postcodes
     my $re = postcode_re;
-    my ( $area, $district, $sector, $unit ) = "AB10 1AA" =~ re;
+    my ( $area, $district, $sector, $unit ) = "AB10 1AA" =~ $re;
 
     # Get hashref of data parsed from postcode
     my $parsed = parse_pc "AB10 1AA";
