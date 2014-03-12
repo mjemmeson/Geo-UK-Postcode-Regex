@@ -51,6 +51,7 @@ See L<Geo::UK::Postcode::Regex::Simple> for an alternative interface.
 
 
     ## VALIDATION METHODS
+
     use Geo::UK::Postcode::Regex qw/ is_valid_pc is_strict_pc is_lax_pc /;
 
     if (is_valid_pc("GE0 1UK")) {
@@ -65,6 +66,7 @@ See L<Geo::UK::Postcode::Regex::Simple> for an alternative interface.
 
 
     ## PARSING
+
     my $parsed = Geo::UK::Postcode::Regex->parse("WC1H 9EB");
 
     # returns:
@@ -75,11 +77,12 @@ See L<Geo::UK::Postcode::Regex::Simple> for an alternative interface.
     #     unit             => 'EB',
     #     outcode          => 'WC1H',
     #     incode           => '9EB',
-    #     valid_outcode    => 1 | 0,
-    #     strict           => 1 | 0,
-    #     partial          => 1 | 0,
-    #     non_geographical => 1 | 0,
-    #     bfpo             => 1 | 0,
+    #     valid_outcode    => 1,
+    #     valid            => 1,
+    #     strict           => 1,
+    #     partial          => 0,
+    #     non_geographical => 0,
+    #     bfpo             => 0,
     # }
 
     # strict parsing (only valid characters):
@@ -88,11 +91,53 @@ See L<Geo::UK::Postcode::Regex::Simple> for an alternative interface.
     # valid outcodes only
     ...->parse( $pc, { valid => 1 } )
 
-    # match partial postcodes, e.g. 'WC1H', 'WC1H 9'
+    # match partial postcodes, e.g. 'WC1H', 'WC1H 9' - see below
     ...->parse( $pc, { partial => 1 } )
 
 
+    ## PARSING PARTIAL POSTCODES
+
+    # outcode (district) only
+    my $parsed = Geo::UK::Postcode::Regex->parse( "AB10", { partial => 1 } );
+
+    # returns:
+    # {   area             => 'AB',
+    #     district         => '10',
+    #     subdistrict      => undef,
+    #     sector           => undef,
+    #     unit             => undef,
+    #     outcode          => 'AB10',
+    #     incode           => undef,
+    #     valid_outcode    => 1,
+    #     valid            => 1,
+    #     strict           => 1,
+    #     partial          => 1,
+    #     non_geographical => 0,
+    #     bfpo             => 0,
+    # }
+
+    # sector only
+    my $parsed = Geo::UK::Postcode::Regex->parse( "AB10 1", { partial => 1 } );
+
+    # returns:
+    # {   area             => 'AB',
+    #     district         => '10',
+    #     subdistrict      => undef,
+    #     sector           => 1,
+    #     unit             => undef,
+    #     outcode          => 'AB10',
+    #     incode           => '1',
+    #     valid_outcode    => 1,
+    #     valid            => 1,
+    #     strict           => 1,
+    #     partial          => 1,
+    #     non_geographical => 0,
+    #     bfpo             => 0,
+    # }
+
+
     ## EXTRACT OUTCODE FROM POSTCODE
+
     my $outcode = Geo::UK::Postcode::Regex->outcode("AB101AA"); # returns 'AB10'
 
     my $outcode = Geo::UK::Postcode::Regex->outcode( $postcode, { valid => 1 } )
@@ -100,6 +145,7 @@ See L<Geo::UK::Postcode::Regex::Simple> for an alternative interface.
 
 
     ## EXTRACT POSTCODES FROM TEXT
+
     # \%options as per parse, excluding partial
     my @extracted = Geo::UK::Postcode::Regex->extract( $text, \%options );
 
@@ -366,7 +412,7 @@ sub extract {
         : $options->{strict} ? 'strict'
         :                      'lax';
 
-    $key .= '_case-insensitive' if $options->{'case-insensitive'};
+    $string = uc $string if $options->{'case-insensitive'};
 
     my @extracted = $string =~ m/($REGEXES{$key})/g;
 
@@ -377,7 +423,8 @@ sub extract {
 
     my $parsed = Geo::UK::Postcode::Regex->parse( $pc, \%options );
 
-Returns hashref of the constituent parts.
+Returns hashref of the constituent parts - see SYNOPSIS. Missing parts will be
+set as undefined. 
 
 =cut
 
@@ -386,12 +433,12 @@ sub parse {
 
     $options ||= {};
 
-    my $case = $options->{'case-insensitive'} ? '_case-insensitive' : '';
+    $string = uc $string if $options->{'case-insensitive'};
 
     my $re
         = $options->{partial}
-        ? 'partial_anchored_captures' . $case
-        : 'anchored_captures' . $case;
+        ? 'partial_anchored_captures'
+        : 'anchored_captures';
 
     my ( $area, $district, $sector, $unit ) = $string =~ $REGEXES{"strict_$re"};
 
@@ -407,28 +454,31 @@ sub parse {
 
     return unless $unit || $options->{partial};
 
-    $_ = uc( $_ // '' ) foreach ( $area, $district, $sector, $unit );
+    return unless defined $district;
 
     my $outcode      = $area . $district;
     my $outcode_data = $class->outcodes_lookup->{$outcode};
 
     return if $options->{valid} && !$outcode_data;
 
-    my $subdistrict = $district =~ s/([A-Z])$// ? $1 : undef;
+    my $subdistrict
+        = defined $district && $district =~ s/([A-Z])$// ? $1 : undef;
+
+    my $incode = $unit ? "$sector$unit" : $sector ? $sector : undef;
 
     return {
-        area          => $area,
-        district      => $district,
-        subdistrict   => $subdistrict,
-        sector        => $sector,
-        unit          => $unit,
-        outcode       => $outcode,
-        incode        => $sector . $unit,
-        valid_outcode => $outcode_data ? 1 : 0,
+        area        => $area,
+        district    => $district,
+        subdistrict => $subdistrict,
+        sector      => $sector,
+        unit        => $unit,
+        outcode     => $outcode,
+        incode      => $incode,
 
         strict  => $strict,
         partial => $unit ? 0 : 1,
         valid   => $outcode_data && $strict ? 1 : 0,
+        valid_outcode => $outcode_data ? 1 : 0,
 
         $outcode_data->{non_geographical} ? ( non_geographical => 1 ) : (),
         $outcode eq "BF1"                 ? ( bfpo             => 1 ) : (),
