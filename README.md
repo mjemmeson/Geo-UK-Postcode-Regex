@@ -1,6 +1,6 @@
 # NAME
 
-Geo::UK::Postcode::Regex
+Geo::UK::Postcode::Regex - regular expressions for handling British postcodes
 
 # SYNOPSIS
 
@@ -38,6 +38,7 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
 
 
     ## VALIDATION METHODS
+
     use Geo::UK::Postcode::Regex qw/ is_valid_pc is_strict_pc is_lax_pc /;
 
     if (is_valid_pc("GE0 1UK")) {
@@ -53,6 +54,7 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
 
 
     ## PARSING
+
     my $parsed = Geo::UK::Postcode::Regex->parse("WC1H 9EB");
 
     # returns:
@@ -63,11 +65,12 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
     #     unit             => 'EB',
     #     outcode          => 'WC1H',
     #     incode           => '9EB',
-    #     valid_outcode    => 1 | 0,
-    #     strict           => 1 | 0,
-    #     partial          => 1 | 0,
-    #     non_geographical => 1 | 0,
-    #     bfpo             => 1 | 0,
+    #     valid_outcode    => 1,
+    #     valid            => 1,
+    #     strict           => 1,
+    #     partial          => 0,
+    #     non_geographical => 0,
+    #     bfpo             => 0,
     # }
 
     # strict parsing (only valid characters):
@@ -76,12 +79,55 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
     # valid outcodes only
     ...->parse( $pc, { valid => 1 } )
 
-    # match partial postcodes, e.g. 'WC1H', 'WC1H 9'
+    # match partial postcodes, e.g. 'WC1H', 'WC1H 9' - see below
     ...->parse( $pc, { partial => 1 } )
 
 
 
+    ## PARSING PARTIAL POSTCODES
+
+    # outcode (district) only
+    my $parsed = Geo::UK::Postcode::Regex->parse( "AB10", { partial => 1 } );
+
+    # returns:
+    # {   area             => 'AB',
+    #     district         => '10',
+    #     subdistrict      => undef,
+    #     sector           => undef,
+    #     unit             => undef,
+    #     outcode          => 'AB10',
+    #     incode           => undef,
+    #     valid_outcode    => 1,
+    #     valid            => 1,
+    #     strict           => 1,
+    #     partial          => 1,
+    #     non_geographical => 0,
+    #     bfpo             => 0,
+    # }
+
+    # sector only
+    my $parsed = Geo::UK::Postcode::Regex->parse( "AB10 1", { partial => 1 } );
+
+    # returns:
+    # {   area             => 'AB',
+    #     district         => '10',
+    #     subdistrict      => undef,
+    #     sector           => 1,
+    #     unit             => undef,
+    #     outcode          => 'AB10',
+    #     incode           => '1',
+    #     valid_outcode    => 1,
+    #     valid            => 1,
+    #     strict           => 1,
+    #     partial          => 1,
+    #     non_geographical => 0,
+    #     bfpo             => 0,
+    # }
+
+
+
     ## EXTRACT OUTCODE FROM POSTCODE
+
     my $outcode = Geo::UK::Postcode::Regex->outcode("AB101AA"); # returns 'AB10'
 
     my $outcode = Geo::UK::Postcode::Regex->outcode( $postcode, { valid => 1 } )
@@ -90,6 +136,7 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
 
 
     ## EXTRACT POSTCODES FROM TEXT
+
     # \%options as per parse, excluding partial
     my @extracted = Geo::UK::Postcode::Regex->extract( $text, \%options );
 
@@ -191,7 +238,8 @@ Returns a list of full postcodes extracted from a string.
 
     my $parsed = Geo::UK::Postcode::Regex->parse( $pc, \%options );
 
-Returns hashref of the constituent parts.
+Returns hashref of the constituent parts - see SYNOPSIS. Missing parts will be
+set as undefined. 
 
 ## outcode
 

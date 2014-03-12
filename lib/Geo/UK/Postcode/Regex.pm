@@ -461,8 +461,7 @@ sub parse {
 
     return if $options->{valid} && !$outcode_data;
 
-    my $subdistrict
-        = defined $district && $district =~ s/([A-Z])$// ? $1 : undef;
+    my $subdistrict = $district =~ s/([A-Z])$// ? $1 : undef;
 
     my $incode = $unit ? "$sector$unit" : $sector ? $sector : undef;
 

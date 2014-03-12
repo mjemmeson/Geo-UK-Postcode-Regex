@@ -31,7 +31,7 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "6.17",
             "File::ShareDir::Install" : "0.03",
-            "Module::Build::Tiny" : "0.030"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
@@ -94,7 +94,7 @@
          "web" : "https://github.com/mjemmeson/Geo-UK-Postcode-Regex"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_contributors" : [
       "Michael Jemmeson <michael.jemmeson@cpan.org>"
    ]
