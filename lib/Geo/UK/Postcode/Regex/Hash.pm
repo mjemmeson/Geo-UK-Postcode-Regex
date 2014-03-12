@@ -1,6 +1,6 @@
 package Geo::UK::Postcode::Regex::Hash;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 require Tie::Hash;
 

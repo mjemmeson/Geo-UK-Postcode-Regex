@@ -8,7 +8,7 @@ use Geo::UK::Postcode::Regex::Hash;
 use base 'Exporter';
 our @EXPORT_OK = qw/ is_valid_pc is_strict_pc is_lax_pc %REGEXES /;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 =encoding utf-8
 
