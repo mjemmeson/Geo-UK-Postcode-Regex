@@ -2,6 +2,13 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+  [Important behaviour changes to parse()]
+  - 'incode' now set to undef if sector and unit are missing from a postcode (previously set to empty string)
+  - 'valid_outcode' no longer returned 
+
+  [Maintenance]
+  - Updating POD, correcting SYNOPSIS
+
 0.011  2014-03-12 16:59:16 GMT
 
   [Important behaviour changes to parse()]

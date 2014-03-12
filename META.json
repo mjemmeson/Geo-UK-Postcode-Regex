@@ -94,7 +94,7 @@
          "web" : "https://github.com/mjemmeson/Geo-UK-Postcode-Regex"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_contributors" : [
       "Michael Jemmeson <michael.jemmeson@cpan.org>"
    ]
