@@ -2,6 +2,8 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+  - Reduced perl requirement to v5.8.1
+
 0.012  2014-03-12 17:06:25 GMT
 
   [Important behaviour changes to parse()]

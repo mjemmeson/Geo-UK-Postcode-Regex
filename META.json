@@ -62,7 +62,7 @@
             "Exporter" : "0",
             "Tie::Hash" : "0",
             "base" : "0",
-            "perl" : "5.010",
+            "perl" : "5.008001",
             "strict" : "0",
             "warnings" : "0"
          }
