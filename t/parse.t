@@ -24,10 +24,9 @@ my @tests = (
 );
 
 foreach (@tests) {
-    my ( $note, $args ) = each %{$_};
+    my ( $note, $options ) = each %{$_};
     subtest(
         $note => sub {
-            my ($options) = @_;
 
             $options ||= {};
 

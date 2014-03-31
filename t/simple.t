@@ -23,7 +23,10 @@ subtest(
             ok $re = postcode_re, "got valid postcode regex";
             ok 'XX10 1AA' !~ $re, "valid regex ok - fail";
             ok 'CW13 1AA' !~ $re, "valid regex ok - fail";
+
             ok 'AB10 1AA' =~ $re, "valid regex ok - success";
+            ok my @matches = 'AB10 1AA' =~ $re, "got captures";
+            is_deeply \@matches, [ 'AB10', '1', 'AA' ], "captures ok";
         }
 
         {
@@ -51,14 +54,43 @@ subtest(
             ok 'ab10 1aa' =~ $re, "regex ok with lower case postcode";
             ok 'AB10 1AA' =~ $re, "regex ok with upper case postcode";
         }
+
+        {
+            local $Geo::UK::Postcode::Regex::Simple::PARTIAL = 1;
+            ok $re = postcode_re, "got partial postcode regex";
+
+            ok my @matches = 'AB10 1AA' =~ $re, "regex ok with full postcode";
+            is_deeply \@matches, [ 'AB', '10', '1', 'AA' ], "captures ok";
+
+            ok @matches = 'AB10' =~ $re, "regex ok with partial postcode";
+            is_deeply \@matches, [ 'AB', '10', undef, undef ], "captures ok";
+        }
+
+        {
+            local $Geo::UK::Postcode::Regex::Simple::PARTIAL = 1;
+            local $Geo::UK::Postcode::Regex::Simple::MODE    = 'valid';
+
+            ok $re = postcode_re, "got partial valid postcode regex";
+
+            ok my @matches = 'AB10 1AA' =~ $re, "regex ok with full postcode";
+            is_deeply \@matches, [ 'AB10', '1', 'AA' ], "captures ok";
+
+            ok @matches = 'AB10' =~ $re, "regex ok with partial postcode";
+            is_deeply \@matches, [ 'AB10', undef, undef ], "captures ok";
+
+            ok @matches = 'E14' =~ $re, "regex ok with partial postcode";
+            is_deeply \@matches, [ 'E14', undef, undef ], "captures ok";
+        }
     }
 );
 
 subtest(
     parse_pc => sub {
-        ok my $parsed = parse_pc("AB10 1AA"), "parse_pc with defaults";
-        is $parsed->{unit}, 'AA', "parsed ok";
-        ok !parse_pc("XX10 1AA"), "parse_pc with defaults - strict mode";
+        {
+            ok my $parsed = parse_pc("AB10 1AA"), "parse_pc with defaults";
+            is $parsed->{unit}, 'AA', "parsed ok";
+            ok !parse_pc("XX10 1AA"), "parse_pc with defaults - strict mode";
+        }
 
         {
             local $Geo::UK::Postcode::Regex::Simple::MODE = 'lax';
@@ -74,10 +106,13 @@ subtest(
 subtest(
     extract => sub {
 
-        note "with defaults";
-        ok my @extracted = extract_pc "my postcodes are AB10 1AA and wc1A 9zz.",
-            "extract_pc";
-        is_deeply \@extracted, ['AB10 1AA'];
+        {
+            note "with defaults";
+            ok my @extracted
+                = extract_pc "my postcodes are AB10 1AA and wc1A 9zz.",
+                "extract_pc";
+            is_deeply \@extracted, ['AB10 1AA'];
+        }
 
         {
             local $Geo::UK::Postcode::Regex::Simple::CASE_INSENSITIVE = 1;

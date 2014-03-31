@@ -2,7 +2,7 @@ requires "Carp" => "0";
 requires "Exporter" => "0";
 requires "Tie::Hash" => "0";
 requires "base" => "0";
-requires "perl" => "5.008001";
+requires "perl" => "5.010";
 requires "strict" => "0";
 requires "warnings" => "0";
 

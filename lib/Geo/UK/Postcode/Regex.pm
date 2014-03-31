@@ -295,10 +295,11 @@ sub _outcode_data {
                 join(
                     ' | ',
                     map {
-                              $_ . '['
-                            . join( '', @{ $area_districts{$area}->{$_} } )
-                            . ']'
-                    } sort keys %{ $area_districts{$area} }
+                        sprintf( "%s[%s]",
+                            $_, join( '', @{ $area_districts{$area}->{$_} } ) )
+                        }       #
+                        sort { $a eq ' ' ? 1 : $b eq ' ' ? -1 : $a <=> $b }
+                        keys %{ $area_districts{$area} }
                 )
                 )
         } sort keys %area_districts

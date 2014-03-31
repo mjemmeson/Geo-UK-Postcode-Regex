@@ -331,15 +331,25 @@ sub test_pcs {
     foreach my $pc (@pcs) {
         next unless $pc->{area};
 
-        $pc->{outcode} ||= sprintf( "%s%s%s",
-            $pc->{area},
-            $pc->{district} // '',
-            $pc->{subdistrict} || '' );
+        my ( $area, $district, $subdistrict, $sector, $unit )
+            = map { $pc->{$_} } qw/ area district subdistrict sector unit /;
 
-        $pc->{incode} ||= sprintf(
-            "%s%s",    #
-            $pc->{sector} // '', $pc->{unit} || ''
-        );
+        $pc->{outcode}
+            ||= sprintf( "%s%s%s", $area, $district // '', $subdistrict || '' );
+
+        $pc->{incode} = defined $sector
+            && $unit ? "$sector$unit" : defined $sector ? $sector : undef;
+
+        $pc->{captures} = [
+            $area,
+            defined $district && $subdistrict ? "$district$subdistrict"
+            : defined $district ? $district
+            : undef,
+            $sector,
+            $unit
+        ];
+
+        $pc->{valid_captures} = [ $pc->{outcode}, $sector, $unit ];
 
     }
 

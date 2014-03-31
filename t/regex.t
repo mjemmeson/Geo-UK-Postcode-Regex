@@ -33,11 +33,15 @@ foreach my $test ( TestGeoUKPostcode->test_pcs ) {
 sub test_regex {
     my ( $test, $raw ) = @_;
 
+    my @captures;
+
     unless ( $test->{partial} ) {
 
         if ( $test->{strict} ) {
             ok is_strict_pc($raw), "is_strict_pc true";
-            ok $raw =~ $strict_re, "$raw matches strict regex";
+            ok @captures = $raw =~ $strict_re, "$raw matches strict regex";
+            is_deeply \@captures, $test->{captures}, "captures ok";
+
         } else {
             ok !is_strict_pc($raw), "is_strict_pc false";
             ok $raw !~ $strict_re, "$raw doesn't match strict regex";
@@ -45,7 +49,9 @@ sub test_regex {
 
         if ( $test->{valid} && $test->{strict} ) {
             ok is_valid_pc($raw), "is_valid_pc true";
-            ok $raw =~ $valid_re, "$raw matches valid regex";
+            ok @captures = $raw =~ $valid_re, "$raw matches valid regex";
+            is_deeply \@captures, $test->{valid_captures}, "captures ok";
+
         } else {
             ok !is_valid_pc($raw), "is_valid_pc false";
             ok $raw !~ $valid_re, "$raw doesn't match valid regex";
@@ -53,7 +59,9 @@ sub test_regex {
 
         if ( $test->{area} ) {
             ok is_lax_pc($raw), "is_lax_pc true";
-            ok $raw =~ $re, "$raw matches lax regex";
+            ok @captures = $raw =~ $re, "$raw matches lax regex";
+            is_deeply \@captures, $test->{captures}, "captures ok";
+
         } else {
             ok !is_lax_pc($raw), "is_lax_pc false";
             ok $raw !~ $re, "$raw doesn't match lax regex";
@@ -62,20 +70,28 @@ sub test_regex {
     }
 
     if ( $test->{area} ) {
-        ok $raw =~ $re_partial, "$raw matches lax regex partial";
+        ok @captures = $raw =~ $re_partial, "$raw matches lax regex partial";
+        is_deeply \@captures, $test->{captures}, "captures ok";
+
     } else {
         ok $raw !~ $re_partial, "$raw doesn't match lax regex partial";
     }
 
     if ( $test->{strict} ) {
-        ok $raw =~ $strict_re_partial, "$raw matches strict regex partial";
+        ok @captures = $raw =~ $strict_re_partial,
+            "$raw matches strict regex partial";
+        is_deeply \@captures, $test->{captures}, "captures ok";
+
     } else {
         ok $raw !~ $strict_re_partial,
             "$raw doesn't match strict regex partial";
     }
 
     if ( $test->{valid} && $test->{strict} ) {
-        ok $raw =~ $valid_re_partial, "$raw matches valid regex partial";
+        ok @captures = $raw =~ $valid_re_partial,
+            "$raw matches valid regex partial";
+        is_deeply \@captures, $test->{valid_captures}, "captures ok";
+
     } else {
         ok $raw !~ $valid_re_partial, "$raw doesn't match valid regex partial";
     }
