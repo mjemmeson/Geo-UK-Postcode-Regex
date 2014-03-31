@@ -289,6 +289,23 @@ Hashref of posttown to outcode(s);
 - [CGI::Untaint::uk_postcode](https://metacpan.org/pod/CGI::Untaint::uk_postcode)
 - [Form::Validator::UKPostcode](https://metacpan.org/pod/Form::Validator::UKPostcode)
 
+# SUPPORT
+
+## Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at [https://github.com/mjemmeson/geo-uk-postcode-regex/issues](https://github.com/mjemmeson/geo-uk-postcode-regex/issues).
+You will be notified automatically of any progress on your issue.
+
+## Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+[https://github.com/mjemmeson/geo-uk-postcode-regex](https://github.com/mjemmeson/geo-uk-postcode-regex)
+
+    git clone git://github.com/mjemmeson/geo-uk-postcode-regex.git
+
 # AUTHOR
 
 Michael Jemmeson <mjemmeson@cpan.org>

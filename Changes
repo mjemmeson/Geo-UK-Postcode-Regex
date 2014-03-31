@@ -2,6 +2,8 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.013  2014-03-31 13:10:16 BST
+
   [Bugfix]
   - Correct parsing of partial postcodes when using valid outcodes (now matches 'E14' as 'E14' not 'E1')
 
