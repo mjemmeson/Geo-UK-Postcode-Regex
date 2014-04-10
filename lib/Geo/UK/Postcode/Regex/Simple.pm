@@ -14,7 +14,7 @@ use Geo::UK::Postcode::Regex qw/ %REGEXES /;
 our @EXPORT_OK = qw/ postcode_re extract_pc parse_pc validate_pc /;
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $MODE             = 'strict';    # or valid or lax
+our $MODE             = 'strict';    # or 'valid' or 'lax'
 our $PARTIAL          = 0;
 our $ANCHORED         = 1;
 our $CAPTURES         = 1;
@@ -140,6 +140,7 @@ Geo::UK::Postcode::Regex::Simple - Simplified interface to Geo::UK::Postcode::Re
 Alternate global configuration:
 
     use Geo::UK::Postcode::Regex::Simple    #
+        ':all'                              #
         -strict                             # or -lax, -valid
         -full                               # or -partial
         -anchored                           # or -unanchored
