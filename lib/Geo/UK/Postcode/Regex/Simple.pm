@@ -113,6 +113,8 @@ Geo::UK::Postcode::Regex::Simple - Simplified interface to Geo::UK::Postcode::Re
 
 =head1 SYNOPSIS
 
+Localised configuration:
+
     use Geo::UK::Postcode::Regex::Simple ':all';
 
     # Set behaviour of regular expression (defaults below)
@@ -132,7 +134,7 @@ Geo::UK::Postcode::Regex::Simple - Simplified interface to Geo::UK::Postcode::Re
     # Extract list of postcodes from text string
     my @extracted = extract_pc $text;
 
-    # Check if string is a correct postcode 
+    # Check if string is a correct postcode
     if ( validate_pc $string ) {
         ...
     }
@@ -188,7 +190,8 @@ C<postcode_re>.
 =head2 CAPTURES (default = true )
 
 Puts capture groups into the regular expression returned by C<postcode_re>. The
-matches returned upon a successful match are: area, district, sector and unit.
+matches returned upon a successful match are: area, district, sector and unit
+(or outcode, sector and unit for 'valid' mode).
 
 =head2 CASE_INSENSITIVE (default = false)
 
