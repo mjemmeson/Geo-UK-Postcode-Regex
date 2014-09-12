@@ -6,7 +6,7 @@ use warnings;
 use Geo::UK::Postcode::Regex::Hash;
 
 use base 'Exporter';
-our @EXPORT_OK = qw/ is_valid_pc is_strict_pc is_lax_pc %REGEXES /;
+our @EXPORT_OK = qw( is_valid_pc is_strict_pc is_lax_pc %REGEXES );
 
 our $VERSION = '0.013';
 
@@ -52,7 +52,7 @@ See L<Geo::UK::Postcode::Regex::Simple> for an alternative interface.
 
     ## VALIDATION METHODS
 
-    use Geo::UK::Postcode::Regex qw/ is_valid_pc is_strict_pc is_lax_pc /;
+    use Geo::UK::Postcode::Regex qw( is_valid_pc is_strict_pc is_lax_pc );
 
     if (is_valid_pc("GE0 1UK")) {
         ...
@@ -218,13 +218,9 @@ my %BASE_REGEXES = (
 my ( %POSTTOWNS, %OUTCODES );
 
 tie our %REGEXES, 'Geo::UK::Postcode::Regex::Hash', _fetch => sub {
-    Geo::UK::Postcode::Regex->_get_re(shift);
-};
+    my ($key) = @_;
 
-sub _get_re {
-    my ( $class, $key ) = @_;
-
-    $class->_outcode_data() if $key =~ m/valid/ && !%OUTCODES;
+    _outcode_data() if $key =~ m/valid/ && !%OUTCODES;
 
     my $type = $key =~ m/lax/ ? 'lax' : 'strict';
 
@@ -232,8 +228,8 @@ sub _get_re {
 
     my @comps
         = $key =~ m/valid/
-        ? @{$components}{qw/ outcodes blank sector unit /}
-        : @{$components}{qw/ area district sector unit /};
+        ? @{$components}{qw( outcodes blank sector unit )}
+        : @{$components}{qw( area district sector unit )};
 
     @comps = map { $_ ? "($_)" : $_ } @comps if $key =~ m/captures/;
 
@@ -244,13 +240,11 @@ sub _get_re {
     $re = '^' . $re . '$' if $key =~ m/anchored/;
 
     return $key =~ m/case-insensitive/ ? qr/$re/ix : qr/$re/x;
-}
+};
 
 ## OUTCODE AND POSTTOWN DATA
 
 sub _outcode_data {
-    my $class = shift;
-
     my %area_districts;
 
     # Get outcodes from __DATA__
@@ -349,15 +343,15 @@ Alternative way to access the regexes.
 =cut
 
 sub is_valid_pc {
-    my $pc = @_ > 1 ? $_[1] : $_[0];
+    my $pc = @_ > 1 ? $_[1] : $_[0]; # back-compat: can call as class method
     return $pc =~ $REGEXES{valid_anchored} ? 1 : 0
 }
 sub is_strict_pc {
-    my $pc = @_ > 1 ? $_[1] : $_[0];
+    my $pc = @_ > 1 ? $_[1] : $_[0]; # back-compat: can call as class method
     return $pc =~ $REGEXES{strict_anchored} ? 1 : 0
 }
 sub is_lax_pc {
-    my $pc = @_ > 1 ? $_[1] : $_[0];
+    my $pc = @_ > 1 ? $_[1] : $_[0]; # back-compat: can call as class method
     return $pc =~ $REGEXES{lax_anchored} ? 1 : 0
 }
 
@@ -403,7 +397,7 @@ Returns a list of full postcodes extracted from a string.
 sub extract {
     my ( $class, $string, $options ) = @_;
 
-    $class->_outcode_data() unless %OUTCODES;
+    _outcode_data() unless %OUTCODES;
 
     my $key
         = $options->{valid}  ? 'valid'
@@ -557,7 +551,7 @@ Hashref of posttown to outcode(s);
 sub outcodes_lookup {
     my $class = shift;
 
-    $class->_outcode_data() unless %OUTCODES;
+    _outcode_data() unless %OUTCODES;
 
     return \%OUTCODES;
 }
@@ -565,7 +559,7 @@ sub outcodes_lookup {
 sub posttowns_lookup {
     my $class = shift;
 
-    $class->_outcode_data() unless %POSTTOWNS;
+    _outcode_data() unless %POSTTOWNS;
 
     return \%POSTTOWNS;
 }
