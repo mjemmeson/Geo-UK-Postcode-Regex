@@ -12,6 +12,7 @@ on 'test' => sub {
   requires "File::Spec::Functions" => "0";
   requires "List::Util" => "0";
   requires "Test::More" => "0.96";
+  requires "Test::Exception" => "0.96";
   requires "lib" => "0";
 };
 

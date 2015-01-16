@@ -36,10 +36,9 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
     }
 
 
-
     ## VALIDATION METHODS
 
-    use Geo::UK::Postcode::Regex qw/ is_valid_pc is_strict_pc is_lax_pc /;
+    use Geo::UK::Postcode::Regex qw( is_valid_pc is_strict_pc is_lax_pc );
 
     if (is_valid_pc("GE0 1UK")) {
         ...
@@ -50,7 +49,6 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
     if (is_lax_pc("GE0 1UK")) {
         ...
     }
-
 
 
     ## PARSING
@@ -80,7 +78,6 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
 
     # match partial postcodes, e.g. 'WC1H', 'WC1H 9' - see below
     ...->parse( $pc, { partial => 1 } )
-
 
 
     ## PARSING PARTIAL POSTCODES
@@ -122,7 +119,6 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
     # }
 
 
-
     ## EXTRACT OUTCODE FROM POSTCODE
 
     my $outcode = Geo::UK::Postcode::Regex->outcode("AB101AA"); # returns 'AB10'
@@ -131,23 +127,18 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
         or die "Invalid postcode";
 
 
-
     ## EXTRACT POSTCODES FROM TEXT
 
     # \%options as per parse, excluding partial
     my @extracted = Geo::UK::Postcode::Regex->extract( $text, \%options );
 
 
-
     ## POSTTOWNS
     my @posttowns = Geo::UK::Postcode::Regex->outcode_to_posttowns($outcode);
 
 
-
     ## OUTCODES
     my @outcodes = Geo::UK::Postcode::Regex->posttown_to_outcodes($posttown);
-
-
 
 # DESCRIPTION
 
@@ -161,7 +152,7 @@ against valid characters and currently valid outcodes.
 Also can determine the posttown(s) from a postcode.
 
 Districts and post town information taken from:
-[https://en.wikipedia.org/wiki/Postcode_districts](https://en.wikipedia.org/wiki/Postcode_districts)
+[https://en.wikipedia.org/wiki/Postcode\_districts](https://en.wikipedia.org/wiki/Postcode_districts)
 
 # NOTES AND LIMITATIONS
 
@@ -286,7 +277,7 @@ Hashref of posttown to outcode(s);
 - [Geo::Address::Mail::UK](https://metacpan.org/pod/Geo::Address::Mail::UK)
 - [Geo::Postcode](https://metacpan.org/pod/Geo::Postcode)
 - [Data::Validation::Constraints::Postcode](https://metacpan.org/pod/Data::Validation::Constraints::Postcode)
-- [CGI::Untaint::uk_postcode](https://metacpan.org/pod/CGI::Untaint::uk_postcode)
+- [CGI::Untaint::uk\_postcode](https://metacpan.org/pod/CGI::Untaint::uk_postcode)
 - [Form::Validator::UKPostcode](https://metacpan.org/pod/Form::Validator::UKPostcode)
 
 # SUPPORT

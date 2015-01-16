@@ -4,7 +4,10 @@ use strict;
 use warnings;
 
 my @TEST_PCS = (
-    { raw => 'X', partial => 1 },
+    {   raw     => 'X',
+        partial => 1,
+        lax     => 0,
+    },
     {   raw          => 'XX1',
         area         => 'XX',
         district     => '1',
@@ -41,9 +44,11 @@ my @TEST_PCS = (
         partial      => 1,
         fixed_format => 'XX1X 1  ',
     },
-    { raw => 'XX11X1XX' },
-    {   raw          => 'QI1 1AA',
-        area         => 'QI',
+    {   raw => 'XX11X1XX',
+        lax => 0,
+    },
+    {   raw  => 'QI1 1AA',
+        area => 'QI',
         district     => '1',
         subdistrict  => undef,
         sector       => '1',
@@ -57,6 +62,7 @@ my @TEST_PCS = (
         sector        => '1',
         unit          => 'II',
         fixed_format  => 'AB10 1II',
+        posttowns     => ['ABERDEEN'],
     },
     {   raw          => 'A1 1AA',
         area         => 'A',
@@ -121,6 +127,7 @@ my @TEST_PCS = (
         strict       => 1,
         valid        => 1,
         fixed_format => 'AB10 1AA',
+        posttowns    => ['ABERDEEN'],
     },
     {   raw              => 'AB99 1AA',
         area             => 'AB',
@@ -132,6 +139,7 @@ my @TEST_PCS = (
         valid            => 1,
         non_geographical => 1,
         fixed_format     => 'AB99 1AA',
+        posttowns        => ['ABERDEEN'],
     },
     {   raw              => 'BX99 1AA',
         area             => 'BX',
@@ -154,6 +162,7 @@ my @TEST_PCS = (
         strict       => 1,
         valid        => 1,
         fixed_format => 'SE1     ',
+        posttowns    => ['LONDON'],
     },
     {   raw              => 'BF1 1AA',
         area             => 'BF',
@@ -167,6 +176,7 @@ my @TEST_PCS = (
         non_geographical => 1,
         bfpo             => 1,
         fixed_format     => 'BF1  1AA',
+        posttowns        => ['BFPO'],
     },
     {   raw          => 'AB1 2CD',
         area         => 'AB',
@@ -177,6 +187,7 @@ my @TEST_PCS = (
         fixed_format => 'AB1  2CD',
         valid        => 0,
         strict       => 0,
+        posttowns    => [],
     },
     {   raw          => 'WC1H 9EB',
         area         => 'WC',
@@ -187,6 +198,7 @@ my @TEST_PCS = (
         fixed_format => 'WC1H 9EB',
         valid        => 1,
         strict       => 1,
+        posttowns    => ['LONDON'],
     },
     {   raw          => 'AB1',
         area         => 'AB',
@@ -198,6 +210,7 @@ my @TEST_PCS = (
         valid        => 0,
         partial      => 1,
         strict       => 1,
+        posttowns    => [],
     },
     {   raw          => 'SE1',
         area         => 'SE',
@@ -209,6 +222,7 @@ my @TEST_PCS = (
         valid        => 1,
         partial      => 1,
         strict       => 1,
+        posttowns    => ['LONDON'],
     },
     {   raw          => 'SE1 0LH',
         area         => 'SE',
@@ -220,6 +234,7 @@ my @TEST_PCS = (
         valid        => 1,
         partial      => 0,
         strict       => 1,
+        posttowns    => ['LONDON'],
     },
     {   raw          => 'WC1H 9',
         area         => 'WC',
@@ -231,6 +246,7 @@ my @TEST_PCS = (
         valid        => 1,
         partial      => 1,
         strict       => 1,
+        posttowns    => ['LONDON'],
     },
     {   raw              => 'AB99 1AA',
         area             => 'AB',
@@ -243,6 +259,7 @@ my @TEST_PCS = (
         partial          => 0,
         strict           => 1,
         non_geographical => 1,
+        posttowns        => ['ABERDEEN'],
     },
     {   raw              => 'BF1 1AA',
         area             => 'BF',
@@ -256,6 +273,7 @@ my @TEST_PCS = (
         strict           => 1,
         non_geographical => 1,
         bfpo             => 1,
+        posttowns        => ['BFPO'],
     },
     {   raw          => 'B11',
         area         => 'B',
@@ -267,6 +285,7 @@ my @TEST_PCS = (
         valid        => 1,
         partial      => 1,
         strict       => 1,
+        posttowns    => ['BIRMINGHAM'],
     },
     {   raw          => 'B1 1',
         needs_space  => 1,
@@ -279,8 +298,8 @@ my @TEST_PCS = (
         valid        => 1,
         partial      => 1,
         strict       => 1,
+        posttowns    => ['BIRMINGHAM'],
     },
-
     {   raw          => 'N1 0XX',
         area         => 'N',
         district     => '1',
@@ -290,6 +309,7 @@ my @TEST_PCS = (
         fixed_format => 'N1   0XX',
         valid        => 1,
         strict       => 1,
+        posttowns    => ['LONDON'],
     },
     {   raw              => 'N1P 2NG',
         area             => 'N',
@@ -301,6 +321,7 @@ my @TEST_PCS = (
         valid            => 1,
         strict           => 1,
         non_geographical => 1,
+        posttowns        => ['LONDON'],
     },
     {   raw              => 'E2 0HP',
         area             => 'E',
@@ -312,8 +333,15 @@ my @TEST_PCS = (
         valid            => 1,
         strict           => 1,
         non_geographical => 0,
+        posttowns        => ['LONDON'],
     },
 );
+
+sub test_pcs_raw {
+    my $class = shift;
+
+    return map { $_->{raw} } @TEST_PCS;
+}
 
 sub test_pcs {
     my ( $class, $args ) = @_;
@@ -330,6 +358,8 @@ sub test_pcs {
 
     foreach my $pc (@pcs) {
         next unless $pc->{area};
+
+        $pc->{lax} //= 1;
 
         my ( $area, $district, $subdistrict, $sector, $unit )
             = map { $pc->{$_} } qw/ area district subdistrict sector unit /;
@@ -350,7 +380,6 @@ sub test_pcs {
         ];
 
         $pc->{valid_captures} = [ $pc->{outcode}, $sector, $unit ];
-
     }
 
     return @pcs;

@@ -4,7 +4,7 @@
       "Michael Jemmeson <mjemmeson@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 5.009, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "Dist::Zilla version 5.025, Dist::Milla version v1.0.5, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "6.17",
             "File::ShareDir::Install" : "0.03",
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build::Tiny" : "0.039"
          }
       },
       "develop" : {
@@ -77,6 +77,7 @@
             "ExtUtils::MakeMaker" : "0",
             "File::Spec::Functions" : "0",
             "List::Util" : "0",
+            "Test::Exception" : "0.96",
             "Test::More" : "0.96",
             "lib" : "0"
          }

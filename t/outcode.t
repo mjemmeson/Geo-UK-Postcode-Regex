@@ -1,5 +1,3 @@
-# outcode.t
-
 use Test::More;
 
 use strict;

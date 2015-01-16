@@ -1,11 +1,19 @@
-# simple.t
-
 use Test::More;
+use Test::Exception;
 
 use strict;
 use warnings;
 
 use Geo::UK::Postcode::Regex::Simple ':all';
+
+# TODO make this more thorough, like the simple-import-args.t tests
+# and loop through all combinations of options
+
+{
+    local $Geo::UK::Postcode::Regex::Simple::MODE = 'foo';
+    dies_ok {postcode_re} "dies with invalid mode";
+    dies_ok {validate_pc} "dies with invalid mode";
+}
 
 subtest(
     postcode_re => sub {
@@ -138,6 +146,14 @@ subtest(
             ok validate_pc("AB10 1AA");
             ok !validate_pc("XX10 1AA");
             ok validate_pc("ab10 1aa");
+        }
+
+        {
+            local $Geo::UK::Postcode::Regex::Simple::ANCHORED = 0;
+            note "unanchored";
+            ok validate_pc(" this string contains AB10 1AA a postcode");
+            ok !validate_pc(" this string contains XX10 1AA a postcode");
+            ok !validate_pc(" this string contains ab10 1aa a postcode");
         }
 
     }
