@@ -211,8 +211,8 @@ our %COMPONENTS = (
 );
 
 my %BASE_REGEXES = (
-    full          => ' %s %s     \s* %s %s      ',
-    partial       => ' %s %s (?: \s* %s %s? ) ? ',
+    full          => ' %s %s     \s* %s    %s       ',
+    partial       => ' %s %s (?: \s* %s (?:%s)? ) ? ',
 );
 
 my ( %POSTTOWNS, %OUTCODES );

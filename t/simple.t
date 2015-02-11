@@ -4,10 +4,10 @@ use Test::Exception;
 use strict;
 use warnings;
 
-use Geo::UK::Postcode::Regex::Simple ':all';
+use lib 't/lib';
+use TestGeoUKPostcode;
 
-# TODO make this more thorough, like the simple-import-args.t tests
-# and loop through all combinations of options
+use Geo::UK::Postcode::Regex::Simple ':all';
 
 {
     local $Geo::UK::Postcode::Regex::Simple::MODE = 'foo';
@@ -15,149 +15,165 @@ use Geo::UK::Postcode::Regex::Simple ':all';
     dies_ok {validate_pc} "dies with invalid mode";
 }
 
-subtest(
-    postcode_re => sub {
-        ok my $re = postcode_re, "got postcode regex";
-        ok 'AB10 1AA' =~ $re, "regex ok";
+my @test_pcs = TestGeoUKPostcode->test_pcs();
+my @test_pcs_partial = TestGeoUKPostcode->test_pcs( { partial => 1 } );
 
-        {
-            local $Geo::UK::Postcode::Regex::Simple::MODE = 'lax';
-            ok $re = postcode_re, "got lax postcode regex";
-            ok 'XX10 1AA' =~ $re, "lax regex ok";
-        }
+foreach my $mode (qw( valid strict lax )) {
 
-        {
-            local $Geo::UK::Postcode::Regex::Simple::MODE = 'valid';
-            ok $re = postcode_re, "got valid postcode regex";
-            ok 'XX10 1AA' !~ $re, "valid regex ok - fail";
-            ok 'CW13 1AA' !~ $re, "valid regex ok - fail";
+    foreach my $length (qw( partial full )) {
 
-            ok 'AB10 1AA' =~ $re, "valid regex ok - success";
-            ok my @matches = 'AB10 1AA' =~ $re, "got captures";
-            is_deeply \@matches, [ 'AB10', '1', 'AA' ], "captures ok";
-        }
+        foreach my $case (qw( case-insensitive case-sensitive )) {
 
-        {
-            local $Geo::UK::Postcode::Regex::Simple::ANCHORED = 0;
-            ok $re = postcode_re, "got unanchored postcode regex";
-            ok 'blah AB10 1AA blah' =~ $re, "unanchored regex ok";
-        }
+            subtest "$mode-$length-$case" => sub {
 
-        {
-            local $Geo::UK::Postcode::Regex::Simple::ANCHORED = 1;
-            ok $re = postcode_re, "got anchored postcode regex";
-            ok 'blah AB10 1AA blah' !~ $re, "anchored regex ok";
-        }
+                foreach my $captures (qw( nocaptures captures )) {
 
-        {
-            local $Geo::UK::Postcode::Regex::Simple::CAPTURES = 0;
-            ok $re = postcode_re, "got postcode regex with no captures";
-            ok my @matches = 'AB10 1AA' =~ $re, "regex ok with no captures";
-            is_deeply \@matches, [1], "no matches, only true value";
-        }
+                    subtest "postcode_re $captures" => sub {
 
-        {
-            local $Geo::UK::Postcode::Regex::Simple::CASE_INSENSITIVE = 1;
-            ok $re = postcode_re, "got case-insensitive postcode regex";
-            ok 'ab10 1aa' =~ $re, "regex ok with lower case postcode";
-            ok 'AB10 1AA' =~ $re, "regex ok with upper case postcode";
-        }
+                        Geo::UK::Postcode::Regex::Simple->import(    #
+                            "-$mode",
+                            "-$case",
+                            "-$length",
+                            "-$captures"
+                        );
 
-        {
-            local $Geo::UK::Postcode::Regex::Simple::PARTIAL = 1;
-            ok $re = postcode_re, "got partial postcode regex";
+                        ok my $re = postcode_re, "got postcode regex";
 
-            ok my @matches = 'AB10 1AA' =~ $re, "regex ok with full postcode";
-            is_deeply \@matches, [ 'AB', '10', '1', 'AA' ], "captures ok";
+                        foreach my $pc ( @test_pcs, @test_pcs_partial ) {
 
-            ok @matches = 'AB10' =~ $re, "regex ok with partial postcode";
-            is_deeply \@matches, [ 'AB', '10', undef, undef ], "captures ok";
-        }
-
-        {
-            local $Geo::UK::Postcode::Regex::Simple::PARTIAL = 1;
-            local $Geo::UK::Postcode::Regex::Simple::MODE    = 'valid';
-
-            ok $re = postcode_re, "got partial valid postcode regex";
-
-            ok my @matches = 'AB10 1AA' =~ $re, "regex ok with full postcode";
-            is_deeply \@matches, [ 'AB10', '1', 'AA' ], "captures ok";
-
-            ok @matches = 'AB10' =~ $re, "regex ok with partial postcode";
-            is_deeply \@matches, [ 'AB10', undef, undef ], "captures ok";
-
-            ok @matches = 'E14' =~ $re, "regex ok with partial postcode";
-            is_deeply \@matches, [ 'E14', undef, undef ], "captures ok";
+                            subtest $pc->{raw} => sub {
+                                test_postcode_against_regex(
+                                    $pc => {
+                                        mode     => $mode,
+                                        length   => $length,
+                                        case     => $case,
+                                        captures => $captures,
+                                        re       => $re,
+                                    }
+                                );
+                            };
+                        }
+                    };
+                }
+            };
         }
     }
-);
-
-subtest(
-    parse_pc => sub {
-        {
-            ok my $parsed = parse_pc("AB10 1AA"), "parse_pc with defaults";
-            is $parsed->{unit}, 'AA', "parsed ok";
-            ok !parse_pc("XX10 1AA"), "parse_pc with defaults - strict mode";
-        }
-
-        {
-            local $Geo::UK::Postcode::Regex::Simple::MODE = 'lax';
-            ok my $parsed = parse_pc("AB10 1BB"), "parse_pc, lax mode";
-            is $parsed->{unit}, 'BB', "parsed ok";
-            ok $parsed = parse_pc("XX10 1XX"), "parse_pc, lax mode";
-            is $parsed->{unit}, 'XX', "parsed ok";
-        }
-
-    }
-);
-
-subtest(
-    extract => sub {
-
-        {
-            note "with defaults";
-            ok my @extracted
-                = extract_pc "my postcodes are AB10 1AA and wc1A 9zz.",
-                "extract_pc";
-            is_deeply \@extracted, ['AB10 1AA'];
-        }
-
-        {
-            local $Geo::UK::Postcode::Regex::Simple::CASE_INSENSITIVE = 1;
-            note "case-insensitive";
-            ok my @extracted
-                = extract_pc "my postcodes are AB10 1AA and wc1A 9zz.",
-                "extract_pc";
-            is_deeply \@extracted, [ 'AB10 1AA', 'WC1A 9ZZ' ];
-        }
-    }
-);
-
-subtest(
-    validate_pc => sub {
-        note "with defaults";
-        ok validate_pc("AB10 1AA");
-        ok !validate_pc("XX10 1AA");
-        ok !validate_pc("ab10 1aa");
-
-        {
-            local $Geo::UK::Postcode::Regex::Simple::CASE_INSENSITIVE = 1;
-            note "case-insensitive";
-            ok validate_pc("AB10 1AA");
-            ok !validate_pc("XX10 1AA");
-            ok validate_pc("ab10 1aa");
-        }
-
-        {
-            local $Geo::UK::Postcode::Regex::Simple::ANCHORED = 0;
-            note "unanchored";
-            ok validate_pc(" this string contains AB10 1AA a postcode");
-            ok !validate_pc(" this string contains XX10 1AA a postcode");
-            ok !validate_pc(" this string contains ab10 1aa a postcode");
-        }
-
-    }
-);
+}
 
 done_testing();
+
+sub test_postcode_against_regex {
+    my ( $pc, $test ) = @_;
+
+    my ( $mode, $length, $case, $re ) = @{$test}{qw( mode length case re )};
+
+    my @strings = TestGeoUKPostcode->get_format_list($pc);
+
+    my $match = 1;
+    $match = 0 unless $pc->{$mode};
+    $match = 0 if $pc->{partial} && $length eq 'full';
+
+    foreach my $str (@strings) {
+        if ($match) {
+
+            if ( $test->{captures} eq 'captures' ) {
+                ok my @matches = $str =~ $re,
+                    "$str matches $mode, $length, $case";
+
+                test_postcode_captures( $pc, $test, @matches );
+            } else {
+                ok $str=~ $re, "$str matches $mode, $length, $case";
+            }
+
+        } else {
+            ok $str !~ $re, "$str doesn't match $mode, $length, $case";
+        }
+    }
+
+    my @strings_lc = TestGeoUKPostcode->get_lc_format_list($pc);
+
+    $match = 0 if $case eq 'case-sensitive';
+
+    foreach my $str (@strings_lc) {
+        if ($match) {
+            if ( $test->{captures} eq 'captures' ) {
+                ok my @matches = $str =~ $re,
+                    "$str matches $mode, $length, $case";
+                test_postcode_captures( $pc, $test, @matches );
+            } else {
+                ok $str=~ $re, "$str matches $mode, $length, $case";
+            }
+        } else {
+            ok $str !~ $re, "$str doesn't match $mode, $length, $case";
+        }
+    }
+}
+
+sub test_postcode_captures {
+    my ( $pc, $test, @matches ) = @_;
+
+    my ( $outcode, $area, $district, $sector, $unit );
+
+    if ( $test->{case} eq 'case-insensitive' ) {
+        $outcode  = uc $outcode  if $outcode;
+        $area     = uc $area     if $area;
+        $district = uc $district if $district;
+        $sector   = uc $sector   if $sector;
+        $unit     = uc $unit     if $unit;
+    }
+
+    if ( $test->{mode} eq 'valid' ) {
+        ( $outcode, $sector, $unit ) = @matches;
+
+        if ( $test->{case} eq 'case-insensitive' ) {
+            $outcode = uc $outcode if $outcode;
+            $sector  = uc $sector  if $sector;
+            $unit    = uc $unit    if $unit;
+        }
+
+        if ( $pc->{outcode} ) {
+            is $outcode, $pc->{outcode}, "Outcode matched ok";
+        } else {
+            ok !$outcode, "Outcode not matched";
+        }
+
+    } else {
+        ( $area, $district, $sector, $unit ) = @matches;
+
+        if ( $test->{case} eq 'case-insensitive' ) {
+            $area     = uc $area     if $area;
+            $district = uc $district if $district;
+            $sector   = uc $sector   if $sector;
+            $unit     = uc $unit     if $unit;
+        }
+
+        if ( $pc->{area} ) {
+            is $area, $pc->{area}, "Area matched ok";
+        } else {
+            ok !$area, "Area not matched";
+        }
+
+        if ( $pc->{subdistrict} ) {
+            is $district, $pc->{district} . $pc->{subdistrict},
+                "District (including subdistrict) matched ok";
+        } elsif ( $pc->{district} ) {
+            is $district, $pc->{district}, "District matched ok";
+        } else {
+            ok !$district, "District not matched";
+        }
+    }
+
+    if ( $pc->{sector} ) {
+        is $sector, $pc->{sector}, "Sector matched ok";
+    } else {
+        ok !$sector, "Sector not matched";
+    }
+
+    if ( $pc->{unit} ) {
+        is $unit, $pc->{unit}, "Unit matched ok";
+    } else {
+        ok !$unit, "Unit not matched";
+    }
+
+}
 

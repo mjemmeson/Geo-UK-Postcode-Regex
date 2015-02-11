@@ -41,7 +41,7 @@ sub import {
         :                               $ANCHORED;
     $CAPTURES
         = delete $tags{'-nocaptures'} ? 0
-        : delete $tags{'-nocaptures'} ? 1
+        : delete $tags{'-captures'}   ? 1
         :                               $CAPTURES;
 
     $CASE_INSENSITIVE
