@@ -20,7 +20,7 @@ my @test_pcs_partial = TestGeoUKPostcode->test_pcs( { partial => 1 } );
 
 foreach my $mode (qw( valid strict lax )) {
 
-    foreach my $length (qw( partial full )) {
+    foreach my $length (qw( full partial )) {
 
         foreach my $case (qw( case-insensitive case-sensitive )) {
 
@@ -28,32 +28,37 @@ foreach my $mode (qw( valid strict lax )) {
 
                 foreach my $captures (qw( nocaptures captures )) {
 
-                    subtest "postcode_re $captures" => sub {
+                    foreach my $anchored (qw( anchored unanchored )) {
 
-                        Geo::UK::Postcode::Regex::Simple->import(    #
-                            "-$mode",
-                            "-$case",
-                            "-$length",
-                            "-$captures"
-                        );
+                        subtest "postcode_re $captures $anchored" => sub {
 
-                        ok my $re = postcode_re, "got postcode regex";
+                            Geo::UK::Postcode::Regex::Simple->import(    #
+                                "-$mode",
+                                "-$case",
+                                "-$length",
+                                "-$captures",
+                                "-$anchored",
+                            );
 
-                        foreach my $pc ( @test_pcs, @test_pcs_partial ) {
+                            ok my $re = postcode_re, "got postcode regex";
 
-                            subtest $pc->{raw} => sub {
-                                test_postcode_against_regex(
-                                    $pc => {
-                                        mode     => $mode,
-                                        length   => $length,
-                                        case     => $case,
-                                        captures => $captures,
-                                        re       => $re,
-                                    }
-                                );
-                            };
-                        }
-                    };
+                            foreach my $pc ( @test_pcs, @test_pcs_partial ) {
+
+                                subtest $pc->{raw} => sub {
+                                     test_postcode_against_regex(
+                                         $pc => {
+                                             mode     => $mode,
+                                             length   => $length,
+                                             case     => $case,
+                                             captures => $captures,
+                                             anchored => $anchored,
+                                             re       => $re,
+                                         }
+                                     );
+                                };
+                            }
+                        };
+                    }
                 }
             };
         }
@@ -63,48 +68,76 @@ foreach my $mode (qw( valid strict lax )) {
 done_testing();
 
 sub test_postcode_against_regex {
-    my ( $pc, $test ) = @_;
+    my %pc   = %{ +shift };
+    my $test = shift;
 
-    my ( $mode, $length, $case, $re ) = @{$test}{qw( mode length case re )};
+    my ( $mode, $length, $case, $anchored, $re )
+        = @{$test}{qw( mode length case anchored re )};
 
-    my @strings = TestGeoUKPostcode->get_format_list($pc);
-
-    my $match = 1;
-    $match = 0 unless $pc->{$mode};
-    $match = 0 if $pc->{partial} && $length eq 'full';
-
-    foreach my $str (@strings) {
-        if ($match) {
-
-            if ( $test->{captures} eq 'captures' ) {
-                ok my @matches = $str =~ $re,
-                    "$str matches $mode, $length, $case";
-
-                test_postcode_captures( $pc, $test, @matches );
-            } else {
-                ok $str=~ $re, "$str matches $mode, $length, $case";
-            }
-
-        } else {
-            ok $str !~ $re, "$str doesn't match $mode, $length, $case";
-        }
+    if ( $anchored eq 'unanchored' && $pc{unanchored} ) {
+        %pc = ( %pc, %{ $pc{unanchored} } ) if $pc{unanchored}->{$mode} && $length eq 'partial';
     }
 
-    my @strings_lc = TestGeoUKPostcode->get_lc_format_list($pc);
+    my @strings = TestGeoUKPostcode->get_format_list( \%pc );
+
+    my $match = 1;
+    $match = 0 unless $pc{$mode};
+
+    $match = 0 if $pc{partial} && $length eq 'full';
+
+    test_string( \%pc, $test, $match, $_ ) foreach @strings;
+
+    my @strings_lc = TestGeoUKPostcode->get_lc_format_list( \%pc );
 
     $match = 0 if $case eq 'case-sensitive';
 
-    foreach my $str (@strings_lc) {
-        if ($match) {
-            if ( $test->{captures} eq 'captures' ) {
-                ok my @matches = $str =~ $re,
-                    "$str matches $mode, $length, $case";
-                test_postcode_captures( $pc, $test, @matches );
-            } else {
-                ok $str=~ $re, "$str matches $mode, $length, $case";
-            }
+    test_string( \%pc, $test, $match, $_ ) foreach @strings_lc;
+}
+
+sub test_string {
+    my ( $pc, $test, $match, $str ) = @_;
+
+    my ( $mode, $length, $case, $captures, $anchored, $re )
+        = @{$test}{qw( mode length case captures anchored re )};
+
+    if ($match) {
+
+        if ( $captures eq 'captures' ) {
+            ok my @matches = $str =~ $re, "$str matches $mode, $length, $case";
+
+            test_postcode_captures( $pc, $test, @matches );
+
         } else {
-            ok $str !~ $re, "$str doesn't match $mode, $length, $case";
+            ok $str=~ $re, "$str matches $mode, $length, $case";
+
+        }
+
+        ok validate_pc($str), "validate_pc ok (true)";
+
+        if ( $anchored eq 'anchored' ) {
+            ok my $parsed = parse_pc($str), "parse_pc returns true";
+
+            test_parsed_pc( $pc, $parsed );
+        }
+
+        if ( $length ne 'partial' ) {
+            is_deeply [ extract_pc("foo bar $str baz") ], [ uc $str ],
+                "extract_pc ok";
+        }
+
+    } else {
+
+        ok $str !~ $re, "$str doesn't match $mode, $length, $case";
+
+        ok !validate_pc($str), "validate_pc ok (false)";
+
+        if ( $anchored eq 'anchored' ) {
+            ok !parse_pc($str), "parse_pc returns false";
+        }
+
+        if ( $length ne 'partial' ) {
+            is_deeply [ extract_pc("foo bar $str baz") ], [],
+                "extract_pc ok (found none)";
         }
     }
 }
@@ -175,5 +208,17 @@ sub test_postcode_captures {
         ok !$unit, "Unit not matched";
     }
 
+}
+
+sub test_parsed_pc {
+    my ( $pc, $parsed ) = @_;
+
+    foreach (qw( area district subdistrict sector unit outcode incode )) {
+        is $parsed->{$_}, $pc->{$_}, "$_ ok";
+    }
+
+    foreach (qw( valid partial full )) {
+        ok $pc->{$_} ? $parsed->{$_} : !$parsed->{$_}, "$_ ok";
+    }
 }
 

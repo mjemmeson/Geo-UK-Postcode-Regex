@@ -50,7 +50,7 @@ sub import {
         :                                     $CASE_INSENSITIVE;
 
     local $Exporter::ExportLevel = 1;
-    $class->SUPER::import( keys %tags );
+    $class->SUPER::import( grep { /^[^\-]/ } keys %tags );
 }
 
 sub postcode_re {
@@ -67,6 +67,9 @@ sub postcode_re {
 }
 
 sub parse_pc {
+
+    croak "parse_pc only works with an anchored regex" unless $ANCHORED;
+
     Geo::UK::Postcode::Regex->parse(
         shift,
         {   partial            => $PARTIAL          ? 1 : 0,
@@ -78,6 +81,9 @@ sub parse_pc {
 }
 
 sub extract_pc {
+
+    croak "extract_pc only works with full postcodes" if $PARTIAL;
+
     Geo::UK::Postcode::Regex->extract(
         shift,
         {   strict             => $MODE eq 'lax'    ? 0 : 1,
@@ -94,9 +100,9 @@ sub validate_pc {
 
     my $key = $MODE;
 
-    $key .= '_anchored' if $ANCHORED;
+    $key .= '_partial' if $PARTIAL;
 
-    # TODO does partial make sense?
+    $key .= '_anchored' if $ANCHORED;
 
     $key .= '_case-insensitive' if $CASE_INSENSITIVE;
 
@@ -236,7 +242,7 @@ Michael Jemmeson E<lt>mjemmeson@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2014- Michael Jemmeson
+Copyright 2015- Michael Jemmeson
 
 =head1 LICENSE
 

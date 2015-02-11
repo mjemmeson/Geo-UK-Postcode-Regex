@@ -237,7 +237,15 @@ tie our %REGEXES, 'Geo::UK::Postcode::Regex::Hash', _fetch => sub {
 
     my $re = sprintf( $BASE_REGEXES{$size}, @comps );
 
-    $re = '^' . $re . '$' if $key =~ m/anchored/;
+    if ( $key =~ m/anchored/ ) {
+        $re = '^' . $re . '$';
+
+    } elsif ( $key =~ m/extract/ ) {
+        $re = '(?:[^0-9A-Z]|\b) (' . $re . ') (?:[^0-9A-Z]|\b)';
+
+    } else {
+        $re = '(?:[^0-9A-Z]|\b) ' . $re . ' (?:[^0-9A-Z]|\b)';
+    }
 
     return $key =~ m/case-insensitive/ ? qr/$re/ix : qr/$re/x;
 };
@@ -404,9 +412,10 @@ sub extract {
         : $options->{strict} ? 'strict'
         :                      'lax';
 
-    $string = uc $string if $options->{'case-insensitive'};
+    $key .= '_case-insensitive' if $options->{'case-insensitive'};
+    $key .= '_extract';
 
-    my @extracted = $string =~ m/($REGEXES{$key})/g;
+    my @extracted = $string =~ m/$REGEXES{$key}/g;
 
     return map {uc} @extracted;
 }
@@ -416,7 +425,7 @@ sub extract {
     my $parsed = Geo::UK::Postcode::Regex->parse( $pc, \%options );
 
 Returns hashref of the constituent parts - see SYNOPSIS. Missing parts will be
-set as undefined. 
+set as undefined.
 
 =cut
 
@@ -617,7 +626,7 @@ Michael Jemmeson E<lt>mjemmeson@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2014- Michael Jemmeson
+Copyright 2015- Michael Jemmeson
 
 =head1 LICENSE
 

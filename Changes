@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+  [Bugfix]
+  - extract/extract_pc methods no longer extract valid postcodes out of invalid ones
+  - unanchored postcodes work correctly
+
 0.013  2014-03-31 13:10:16 BST
 
   [Bugfix]

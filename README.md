@@ -227,7 +227,7 @@ Returns a list of full postcodes extracted from a string.
     my $parsed = Geo::UK::Postcode::Regex->parse( $pc, \%options );
 
 Returns hashref of the constituent parts - see SYNOPSIS. Missing parts will be
-set as undefined. 
+set as undefined.
 
 ## outcode
 
@@ -303,7 +303,7 @@ Michael Jemmeson <mjemmeson@cpan.org>
 
 # COPYRIGHT
 
-Copyright 2014- Michael Jemmeson
+Copyright 2015- Michael Jemmeson
 
 # LICENSE
 
