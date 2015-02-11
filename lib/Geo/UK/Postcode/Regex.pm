@@ -169,6 +169,29 @@ Also can determine the posttown(s) from a postcode.
 Districts and post town information taken from:
 L<https://en.wikipedia.org/wiki/Postcode_districts>
 
+=head1 IMPORTANT CHANGES FOR VERSION 0.014
+
+Please note that various bugfixes have changed the following:
+
+=over
+
+=item *
+
+Unanchored regular expressions no longer match valid postcodes within invalid
+ones.
+
+=item *
+
+Unanchored regular expressions in partial mode now can match a valid or strict
+outcode with an invalid incode.
+
+=back
+
+Please get in touch if you have any questions.
+
+See L<Geo::UK::Postcode::Regex::Simple> for other changes affecting the Simple
+interface.
+
 =head1 NOTES AND LIMITATIONS
 
 When parsing a partial postcode, whitespace may be required to separate the

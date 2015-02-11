@@ -160,6 +160,30 @@ Alternate global configuration:
 
 Alternative interface to L<Geo::UK::Postcode::Regex>.
 
+=head1 IMPORTANT CHANGES FOR VERSION 0.014
+
+Please note that various bugfixes have changed the following:
+
+=over
+
+=item *
+
+C<extract_pc>, C<parse_pc> now die with invalid import options set
+
+=item *
+
+Unanchored regular expressions no longer match valid postcodes within invalid
+ones.
+
+=item *
+
+Unanchored regular expressions in partial mode now can match a valid or strict
+outcode with an invalid incode.
+
+=back
+
+Please get in touch if you have any questions.
+
 =head1 CONFIGURATION
 
 =head2 MODE
