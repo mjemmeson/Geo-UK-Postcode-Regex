@@ -40,6 +40,8 @@
          },
          "requires" : {
             "Dist::Milla" : "v1.0.14",
+            "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::Plugin::MetaProvides" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "IO::Handle" : "0",
