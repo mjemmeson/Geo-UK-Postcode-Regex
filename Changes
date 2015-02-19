@@ -2,6 +2,13 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+  [Documentation]
+  - fixed name of "strict_regex" method in ::Regex
+  - Added Partial Postcodes to SYNOPSIS in ::Regex
+
+  [Testing]
+  - added xt tests to test against CodePointOpen data set
+
 0.014  2015-02-11 17:57:31 GMT
 
   [Bugfix]

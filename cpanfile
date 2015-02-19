@@ -32,6 +32,7 @@ on 'develop' => sub {
   requires "Dist::Zilla::Plugin::MetaNoIndex" => "0";
   requires "File::Spec" => "0";
   requires "File::Temp" => "0";
+  requires "Geo::UK::Postcode::CodePointOpen" => "0"; # for dev only - circular dep
   requires "IO::Handle" => "0";
   requires "IPC::Open3" => "0";
   requires "Pod::Coverage::TrustPod" => "0";

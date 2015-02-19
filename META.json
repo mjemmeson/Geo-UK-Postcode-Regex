@@ -44,6 +44,7 @@
             "Dist::Zilla::Plugin::MetaProvides" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
+            "Geo::UK::Postcode::CodePointOpen" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",

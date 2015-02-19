@@ -11,7 +11,7 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
     ## REGULAR EXPRESSIONS
 
     my $lax_re    = Geo::UK::Postcode::Regex->regex;
-    my $strict_re = Geo::UK::Postcode::Regex->regex_strict;
+    my $strict_re = Geo::UK::Postcode::Regex->strict_regex;
     my $valid_re  = Geo::UK::Postcode::Regex->valid_regex;
 
     # matching only
@@ -34,6 +34,15 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
         my ( $outcode, $sector, $unit ) = ( $1, $2, $3 );
         ...
     }
+
+    # Partial postcodes
+    # - A partial postcode is considered to be specified only to district or
+    # sector level, e.g. "GE0" or "GE0 1"
+
+    # These regular expressions will match both full and partial postcodes:
+    my $lax_re_partial    = Geo::UK::Postcode::Regex->regex_partial;
+    my $strict_re_partial = Geo::UK::Postcode::Regex->strict_regex_partial;
+    my $valid_re_partial  = Geo::UK::Postcode::Regex->valid_regex_partial;
 
 
     ## VALIDATION METHODS
