@@ -2,6 +2,8 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.015  2015-05-29 17:06:29 BST
+
   [Maintenance]
    - fixing incorrect version of Test::Exception in cpanfile
 
