@@ -4,13 +4,13 @@
       "Michael Jemmeson <mjemmeson@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.031, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Geo-UK-Postcode-Regex",
    "no_index" : {
@@ -39,7 +39,7 @@
             "HTML::TreeBuilder" : "0"
          },
          "requires" : {
-            "Dist::Milla" : "v1.0.14",
+            "Dist::Milla" : "v1.0.15",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
             "Dist::Zilla::Plugin::MetaProvides" : "0",
             "File::Spec" : "0",
@@ -74,7 +74,7 @@
             "ExtUtils::MakeMaker" : "0",
             "File::Spec::Functions" : "0",
             "List::Util" : "0",
-            "Test::Exception" : "0.96",
+            "Test::Exception" : "0",
             "Test::More" : "0.96",
             "lib" : "0"
          }
