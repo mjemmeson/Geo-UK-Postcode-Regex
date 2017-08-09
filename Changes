@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+  [Update]
+  - added new SO25, WV98, WV99 non-geographic outcodes
+  - added xt test script to check against full CodePointData dataset
+
 0.015  2015-05-29 17:06:29 BST
 
   [Maintenance]
