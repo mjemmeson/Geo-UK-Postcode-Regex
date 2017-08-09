@@ -11,7 +11,7 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
     ## REGULAR EXPRESSIONS
 
     my $lax_re    = Geo::UK::Postcode::Regex->regex;
-    my $strict_re = Geo::UK::Postcode::Regex->regex_strict;
+    my $strict_re = Geo::UK::Postcode::Regex->strict_regex;
     my $valid_re  = Geo::UK::Postcode::Regex->valid_regex;
 
     # matching only
@@ -142,9 +142,9 @@ See [Geo::UK::Postcode::Regex::Simple](https://metacpan.org/pod/Geo::UK::Postcod
 
 # DESCRIPTION
 
-Parsing UK postcodes with regular expressions. This package has been
-separated from [Geo::UK::Postcode](https://metacpan.org/pod/Geo::UK::Postcode) so it can be installed and used with fewer
-dependencies.
+Parsing UK postcodes with regular expressions (aka Regexp). This package has
+been separated from [Geo::UK::Postcode](https://metacpan.org/pod/Geo::UK::Postcode) so it can be installed and used with
+fewer dependencies.
 
 Can handle partial postcodes (just the outcode or sector) and can test
 against valid characters and currently valid outcodes.
@@ -287,7 +287,7 @@ Hashref of posttown to outcode(s);
 
 # SEE ALSO
 
-- [Geo::UK::Postcode](https://metacpan.org/pod/Geo::UK::Postcode)
+- [Geo::UK::Postcode](https://metacpan.org/pod/Geo::UK::Postcode) - companion package, provides Postcode objects
 - [Geo::Address::Mail::UK](https://metacpan.org/pod/Geo::Address::Mail::UK)
 - [Geo::Postcode](https://metacpan.org/pod/Geo::Postcode)
 - [Data::Validation::Constraints::Postcode](https://metacpan.org/pod/Data::Validation::Constraints::Postcode)
@@ -317,7 +317,7 @@ Michael Jemmeson <mjemmeson@cpan.org>
 
 # COPYRIGHT
 
-Copyright 2015- Michael Jemmeson
+Copyright 2015-2017 Michael Jemmeson
 
 # LICENSE
 
