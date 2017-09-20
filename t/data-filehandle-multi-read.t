@@ -14,8 +14,6 @@ use Test::More;
 use strict;
 use warnings;
 
-use Devel::Dwarn;
-
 use Geo::UK::Postcode::Regex;
 
 my $pkg = 'Geo::UK::Postcode::Regex';
