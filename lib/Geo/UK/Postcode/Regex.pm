@@ -278,6 +278,8 @@ tie our %REGEXES, 'Geo::UK::Postcode::Regex::Hash', _fetch => sub {
 sub _outcode_data {
     my %area_districts;
 
+    # get the original position in the DATA File Handle
+    my $orig_position = tell( DATA );
     # Get outcodes from __DATA__
     while ( my $line = <DATA> ) {
         next unless $line =~ m/\w/;
@@ -290,6 +292,8 @@ sub _outcode_data {
             non_geographical => $non_geographical,
         };
     }
+    # Reset position of DATA File Handle for re-reading
+    seek DATA, $orig_position, 0;
 
     # Add in BX non-geographical outcodes
     foreach ( 1 .. 99 ) {
