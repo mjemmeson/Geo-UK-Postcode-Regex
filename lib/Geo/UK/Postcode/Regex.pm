@@ -651,6 +651,16 @@ L<https://github.com/mjemmeson/geo-uk-postcode-regex>
 
 Michael Jemmeson E<lt>mjemmeson@cpan.orgE<gt>
 
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Tom Bloor C<TBSLIVER>
+
+=back
+
 =head1 COPYRIGHT
 
 Copyright 2015-2017 Michael Jemmeson
