@@ -4,7 +4,7 @@
       "Michael Jemmeson <mjemmeson@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -15,12 +15,12 @@
    "name" : "Geo-UK-Postcode-Regex",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "eg",
+         "examples",
          "inc",
          "share",
-         "eg",
-         "examples"
+         "t",
+         "xt"
       ],
       "file" : [
          "lib/Geo/UK/Postcode/Regex/Hash.pm"
@@ -31,7 +31,7 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "6.17",
             "File::ShareDir::Install" : "0.03",
-            "Module::Build::Tiny" : "0.039"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
@@ -39,7 +39,7 @@
             "HTML::TreeBuilder" : "0"
          },
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.18",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
             "Dist::Zilla::Plugin::MetaProvides" : "0",
             "File::Spec" : "0",
@@ -106,6 +106,7 @@
    "x_contributors" : [
       "Michael Jemmeson <michael.jemmeson@cpan.org>",
       "Tom Bloor <t.bloor@shadowcat.co.uk>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::XS version 2.34"
 }
 

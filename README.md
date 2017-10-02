@@ -315,6 +315,10 @@ public review and contribution under the terms of the license.
 
 Michael Jemmeson <mjemmeson@cpan.org>
 
+# CONTRIBUTORS
+
+- Tom Bloor `TBSLIVER`
+
 # COPYRIGHT
 
 Copyright 2015-2017 Michael Jemmeson
